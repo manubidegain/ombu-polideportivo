@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  /* Figma Design Tokens */
+  --fondo-principal: #ededed;
+  --fondo-secundario: #ffffff;
+  --texto-principal: #1b1b1b;
+  --extra: #666666;
+  --amarillo: #faff00;
+  --azul: #004aad;
+}
+
+@theme inline {
+  --font-heading: var(--font-krona);
+  --font-body: var(--font-poppins);
+
+  --animate-marquee: marquee 25s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+body {
+  background: var(--fondo-principal);
+  color: var(--texto-principal);
+  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-krona), Arial, Helvetica, sans-serif;
+}
+
+.writing-mode-vertical-rl {
+  writing-mode: vertical-rl;
+}
