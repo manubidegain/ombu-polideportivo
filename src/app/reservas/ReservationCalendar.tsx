@@ -7,6 +7,7 @@ import type { Tables } from '@/types/database.types';
 import { addDays, format, startOfWeek, isBefore, startOfDay, isToday, parse, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar } from 'lucide-react';
+import { LoadingSpinner, ButtonSpinner } from '@/components/common/LoadingSpinner';
 
 type Court = Tables<'courts'>;
 type TimeslotConfig = Tables<'timeslot_configs'>;
@@ -489,9 +490,7 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
         )}
 
         {loading ? (
-          <div className="text-center py-8 sm:py-12">
-            <p className="font-body text-[14px] sm:text-[16px] text-gray-400">Cargando horarios...</p>
-          </div>
+          <LoadingSpinner size="md" text="Cargando horarios..." />
         ) : availableSlots.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <p className="font-body text-[14px] sm:text-[16px] text-gray-400">
@@ -578,8 +577,9 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
               <button
                 onClick={confirmReservation}
                 disabled={reserving}
-                className="flex-1 bg-[#dbf228] text-[#1b1b1b] font-heading text-[16px] sm:text-[18px] py-3 rounded-md hover:bg-[#c5db23] transition-colors disabled:opacity-50"
+                className="flex-1 bg-[#dbf228] text-[#1b1b1b] font-heading text-[16px] sm:text-[18px] py-3 rounded-md hover:bg-[#c5db23] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
+                {reserving && <ButtonSpinner />}
                 {reserving ? 'RESERVANDO...' : 'CONFIRMAR'}
               </button>
               <button
