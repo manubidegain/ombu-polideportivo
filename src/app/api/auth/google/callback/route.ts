@@ -3,23 +3,34 @@ import { createServerClient } from '@/lib/supabase/server';
 import { getOAuth2Client } from '@/lib/google-calendar';
 import { google } from 'googleapis';
 
+// Helper to get base URL
+function getBaseUrl(request: NextRequest): string {
+  // First try environment variable
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  // Fallback to request origin
+  return request.nextUrl.origin;
+}
+
 // Handle OAuth callback from Google
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const baseUrl = getBaseUrl(request);
 
     if (error) {
       console.error('OAuth error:', error);
       return NextResponse.redirect(
-        new URL(`/admin/settings?error=oauth_denied`, process.env.NEXT_PUBLIC_APP_URL!)
+        new URL(`/admin/settings?error=oauth_denied`, baseUrl)
       );
     }
 
     if (!code) {
       return NextResponse.redirect(
-        new URL(`/admin/settings?error=no_code`, process.env.NEXT_PUBLIC_APP_URL!)
+        new URL(`/admin/settings?error=no_code`, baseUrl)
       );
     }
 
@@ -30,13 +41,13 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.redirect(new URL('/auth/login', process.env.NEXT_PUBLIC_APP_URL!));
+      return NextResponse.redirect(new URL('/auth/login', baseUrl));
     }
 
     // Check if user is admin via user_metadata
     if (user.user_metadata?.role !== 'admin') {
       return NextResponse.redirect(
-        new URL(`/admin/settings?error=not_admin`, process.env.NEXT_PUBLIC_APP_URL!)
+        new URL(`/admin/settings?error=not_admin`, baseUrl)
       );
     }
 
@@ -46,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokens.access_token || !tokens.refresh_token) {
       return NextResponse.redirect(
-        new URL(`/admin/settings?error=no_tokens`, process.env.NEXT_PUBLIC_APP_URL!)
+        new URL(`/admin/settings?error=no_tokens`, baseUrl)
       );
     }
 
@@ -73,18 +84,19 @@ export async function GET(request: NextRequest) {
     if (insertError) {
       console.error('Error storing tokens:', insertError);
       return NextResponse.redirect(
-        new URL(`/admin/settings?error=storage_failed`, process.env.NEXT_PUBLIC_APP_URL!)
+        new URL(`/admin/settings?error=storage_failed`, baseUrl)
       );
     }
 
     // Success! Redirect to admin settings
     return NextResponse.redirect(
-      new URL(`/admin/settings?success=calendar_connected`, process.env.NEXT_PUBLIC_APP_URL!)
+      new URL(`/admin/settings?success=calendar_connected`, baseUrl)
     );
   } catch (error) {
     console.error('Error in OAuth callback:', error);
+    const baseUrl = getBaseUrl(request);
     return NextResponse.redirect(
-      new URL(`/admin/settings?error=unknown`, process.env.NEXT_PUBLIC_APP_URL!)
+      new URL(`/admin/settings?error=unknown`, baseUrl)
     );
   }
 }
