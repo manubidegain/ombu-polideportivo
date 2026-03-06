@@ -7,8 +7,8 @@ import { toast } from 'sonner';
 interface OAuthToken {
   id: string;
   google_email: string | null;
-  created_at: string;
-  is_active: boolean;
+  created_at: string | null;
+  is_active: boolean | null;
 }
 
 interface GoogleCalendarSettingsProps {
@@ -108,11 +108,11 @@ export function GoogleCalendarSettings({ oauthToken: initialToken }: GoogleCalen
           <div className="bg-white/5 border border-white/10 rounded p-4">
             <p className="font-body text-[12px] text-gray-400 mb-1">Conectado desde</p>
             <p className="font-body text-[14px] text-white">
-              {new Date(tokenInfo.created_at).toLocaleDateString('es-UY', {
+              {tokenInfo.created_at ? new Date(tokenInfo.created_at).toLocaleDateString('es-UY', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-              })}
+              }) : 'Fecha desconocida'}
             </p>
           </div>
 

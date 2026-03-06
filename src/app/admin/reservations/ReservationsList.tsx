@@ -390,7 +390,7 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
               {groupedReservations.map((item) => {
                 const reservation = item.reservation;
                 const isSeries = item.type === 'series';
-                const seriesInfo = item.seriesData;
+                const seriesInfo = item.type === 'series' ? item.seriesData : undefined;
 
                 return (
                   <tr key={reservation.id} className="border-t border-white/10">

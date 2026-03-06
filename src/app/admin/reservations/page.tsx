@@ -12,7 +12,7 @@ export default async function ReservationsPage() {
       .select(`
         *,
         courts (name),
-        user_profiles (full_name, email, phone)
+        user_profiles!reservations_user_id_fkey (full_name, email, phone)
       `)
       .order('reservation_date', { ascending: false })
       .order('start_time', { ascending: false }),

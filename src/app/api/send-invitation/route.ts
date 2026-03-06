@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         `
         *,
         courts (name, type),
-        user_profiles (full_name)
+        user_profiles!reservations_user_id_fkey (full_name)
       `
       )
       .eq('id', reservationId)

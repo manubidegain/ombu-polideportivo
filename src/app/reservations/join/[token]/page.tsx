@@ -22,7 +22,7 @@ export default async function JoinReservationPage({ params }: JoinPageProps) {
       `
       *,
       courts (name, type),
-      user_profiles (full_name, email),
+      user_profiles!reservations_user_id_fkey (full_name, email),
       reservation_players (
         id,
         user_id,

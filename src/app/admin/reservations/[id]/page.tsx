@@ -25,7 +25,7 @@ export default async function ReservationDetailPage({ params }: ReservationDetai
       `
       *,
       courts (name, type),
-      user_profiles (full_name, email, phone)
+      user_profiles!reservations_user_id_fkey (full_name, email, phone)
     `
     )
     .eq('id', id)
@@ -41,7 +41,7 @@ export default async function ReservationDetailPage({ params }: ReservationDetai
     .select(
       `
       *,
-      user_profiles (full_name, email, phone)
+      user_profiles!reservation_players_user_id_fkey (full_name, email, phone)
     `
     )
     .eq('reservation_id', id)

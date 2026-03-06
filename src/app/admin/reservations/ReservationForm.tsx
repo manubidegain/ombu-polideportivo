@@ -40,18 +40,33 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
     });
   };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    user_id: string;
+    court_id: string;
+    reservation_date: string;
+    start_time: string;
+    duration_minutes: number;
+    price: number;
+    status: 'pending' | 'confirmed';
+    notes: string;
+    is_recurring: boolean;
+    recurrence_end_date: string;
+    recurrence_frequency: 'weekly' | 'biweekly';
+    manual_name: string;
+    manual_email: string;
+    manual_phone: string;
+  }>({
     user_id: '',
     court_id: '',
     reservation_date: '',
     start_time: '',
     duration_minutes: 60,
     price: 0,
-    status: 'confirmed' as const,
+    status: 'confirmed',
     notes: '',
     is_recurring: false,
     recurrence_end_date: '',
-    recurrence_frequency: 'weekly' as 'weekly' | 'biweekly',
+    recurrence_frequency: 'weekly',
     // Manual fields (when no user is selected)
     manual_name: '',
     manual_email: '',

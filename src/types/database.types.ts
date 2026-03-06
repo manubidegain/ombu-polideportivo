@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       blocked_dates: {
@@ -88,6 +63,8 @@ export type Database = {
       }
       courts: {
         Row: {
+          calendar_id: string | null
+          calendar_sync_enabled: boolean | null
           capacity: number
           created_at: string
           description: string | null
@@ -101,6 +78,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calendar_id?: string | null
+          calendar_sync_enabled?: boolean | null
           capacity?: number
           created_at?: string
           description?: string | null
@@ -114,6 +93,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calendar_id?: string | null
+          calendar_sync_enabled?: boolean | null
           capacity?: number
           created_at?: string
           description?: string | null
@@ -125,6 +106,48 @@ export type Database = {
           status?: string
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      google_oauth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          expiry_date: number | null
+          google_account_id: string | null
+          google_email: string | null
+          id: string
+          is_active: boolean | null
+          refresh_token: string
+          scope: string | null
+          token_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          expiry_date?: number | null
+          google_account_id?: string | null
+          google_email?: string | null
+          id?: string
+          is_active?: boolean | null
+          refresh_token: string
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          expiry_date?: number | null
+          google_account_id?: string | null
+          google_email?: string | null
+          id?: string
+          is_active?: boolean | null
+          refresh_token?: string
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -304,6 +327,7 @@ export type Database = {
       }
       reservations: {
         Row: {
+          calendar_event_id: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
           court_id: string
@@ -331,6 +355,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          calendar_event_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           court_id: string
@@ -358,6 +383,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          calendar_event_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           court_id?: string
@@ -629,9 +655,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

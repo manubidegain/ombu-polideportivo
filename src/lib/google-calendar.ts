@@ -73,7 +73,7 @@ interface CreateEventParams {
 }
 
 export async function createCalendarEvent(params: CreateEventParams) {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   try {
     const event = {
@@ -115,7 +115,7 @@ interface UpdateEventParams extends CreateEventParams {
 }
 
 export async function updateCalendarEvent(params: UpdateEventParams) {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   try {
     const event = {
@@ -147,7 +147,7 @@ export async function updateCalendarEvent(params: UpdateEventParams) {
 }
 
 export async function deleteCalendarEvent(calendarId: string, eventId: string) {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   try {
     await calendar.events.delete({
@@ -163,7 +163,7 @@ export async function deleteCalendarEvent(calendarId: string, eventId: string) {
 }
 
 export async function listCalendars() {
-  const calendar = getCalendarClient();
+  const calendar = await getCalendarClient();
 
   try {
     const response = await calendar.calendarList.list();
