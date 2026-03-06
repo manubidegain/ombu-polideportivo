@@ -1,4 +1,5 @@
 import { Instagram, MessageCircle } from 'lucide-react';
+import Link from 'next/link';
 
 // Logo desde Figma
 const imgLogo = "https://www.figma.com/api/mcp/asset/59d36321-9c9f-4d83-baf2-4cdbc8041247";
@@ -57,6 +58,16 @@ export default function Footer() {
         {/* Dirección */}
         <div className="mt-8 md:mt-16 lg:mt-[151px]">
           <p className="font-body text-[16px] md:text-[20px] leading-[34px] text-[#dbf228]">Martín Salaberry 2831, Durazno.</p>
+        </div>
+
+        {/* Links legales */}
+        <div className="mt-4">
+          <Link
+            href="/privacidad"
+            className="font-body text-[14px] md:text-[16px] text-gray-400 hover:text-[#dbf228] transition-colors underline"
+          >
+            Política de Privacidad
+          </Link>
         </div>
       </div>
 

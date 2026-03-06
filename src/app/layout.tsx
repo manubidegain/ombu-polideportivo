@@ -20,6 +20,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Polideportivo Ombú - Durazno",
   description: "El punto de encuentro del deporte en Durazno. Pádel, Fútbol 7 y Fútbol 5.",
+  verification: {
+    google: "MEDN9SVRsj6GC_LCRV47u4OnfvRlthOgI7nulKCrsVg",
+  },
 };
 
 export default function RootLayout({
