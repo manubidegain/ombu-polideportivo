@@ -311,13 +311,21 @@ export function PlayersManager({
                             </button>
                           </>
                         )}
-                        {isOwner && (
-                          <button
-                            onClick={() => handleRemovePlayer(player.id)}
-                            className="text-red-400 hover:text-red-300 font-body text-[12px]"
-                          >
-                            Eliminar
-                          </button>
+                        {isOwner && !isCurrentUser && (
+                          <>
+                            <button
+                              onClick={() => handleRespondToInvitation(player.id, 'confirmed')}
+                              className="bg-green-500/20 text-green-400 px-3 py-1 rounded font-body text-[12px] hover:bg-green-500/30"
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              onClick={() => handleRemovePlayer(player.id)}
+                              className="bg-red-500/20 text-red-400 px-3 py-1 rounded font-body text-[12px] hover:bg-red-500/30"
+                            >
+                              Rechazar
+                            </button>
+                          </>
                         )}
                       </div>
                     </div>
