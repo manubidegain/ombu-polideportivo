@@ -28,6 +28,7 @@ export function TeamsManager({
   const [teamConfig, setTeamConfig] = useState(initialTeamConfig);
   const [showTeamForm, setShowTeamForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [teamSize, setTeamSize] = useState<number>(5);
   const router = useRouter();
 
@@ -109,6 +110,7 @@ export function TeamsManager({
   };
 
   const handleMovePlayer = async (playerId: string, toTeam: 'team_a' | 'team_b' | 'unassigned') => {
+    setActionLoading(`${playerId}-${toTeam}`);
     toast.promise(
       (async () => {
         const supabase = createClient();
@@ -129,10 +131,11 @@ export function TeamsManager({
         success: 'Jugador movido',
         error: 'Error al mover jugador',
       }
-    );
+    ).finally(() => setActionLoading(null));
   };
 
   const handleClearTeams = async () => {
+    setActionLoading('clear');
     toast.promise(
       (async () => {
         const supabase = createClient();
@@ -152,7 +155,7 @@ export function TeamsManager({
         success: 'Equipos borrados',
         error: 'Error al borrar equipos',
       }
-    );
+    ).finally(() => setActionLoading(null));
   };
 
   // Only show to owner or confirmed players
@@ -180,9 +183,10 @@ export function TeamsManager({
             {(teamAPlayers.length > 0 || teamBPlayers.length > 0) && (
               <button
                 onClick={handleClearTeams}
-                className="bg-red-500/20 text-red-400 font-body text-[14px] py-2 px-4 rounded hover:bg-red-500/30 transition-colors"
+                disabled={actionLoading === 'clear'}
+                className="bg-red-500/20 text-red-400 font-body text-[14px] py-2 px-4 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50"
               >
-                Borrar Equipos
+                {actionLoading === 'clear' ? 'Borrando...' : 'Borrar Equipos'}
               </button>
             )}
             <button

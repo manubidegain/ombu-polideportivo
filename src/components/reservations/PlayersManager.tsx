@@ -27,6 +27,7 @@ export function PlayersManager({
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
 
   const isOwner = currentUserId === reservationOwnerId;
@@ -114,6 +115,7 @@ export function PlayersManager({
   };
 
   const handleRemovePlayer = async (playerId: string) => {
+    setActionLoading(playerId);
     toast.promise(
       (async () => {
         const supabase = createClient();
@@ -131,10 +133,11 @@ export function PlayersManager({
         success: 'Invitación eliminada correctamente',
         error: 'Error al eliminar invitación',
       }
-    );
+    ).finally(() => setActionLoading(null));
   };
 
   const handleRespondToInvitation = async (playerId: string, status: 'confirmed' | 'declined') => {
+    setActionLoading(`${playerId}-${status}`);
     toast.promise(
       (async () => {
         const supabase = createClient();
@@ -158,7 +161,7 @@ export function PlayersManager({
         success: status === 'confirmed' ? 'Invitación aceptada' : 'Invitación rechazada',
         error: 'Error al responder invitación',
       }
-    );
+    ).finally(() => setActionLoading(null));
   };
 
   const getPlayerDisplay = (player: ReservationPlayer) => {
@@ -263,9 +266,10 @@ export function PlayersManager({
                     {isOwner && (
                       <button
                         onClick={() => handleRemovePlayer(player.id)}
-                        className="text-red-400 hover:text-red-300 font-body text-[12px]"
+                        disabled={actionLoading === player.id}
+                        className="text-red-400 hover:text-red-300 font-body text-[12px] disabled:opacity-50"
                       >
-                        Eliminar
+                        {actionLoading === player.id ? '...' : 'Eliminar'}
                       </button>
                     )}
                   </div>
@@ -299,15 +303,17 @@ export function PlayersManager({
                           <>
                             <button
                               onClick={() => handleRespondToInvitation(player.id, 'confirmed')}
-                              className="bg-green-500/20 text-green-400 px-3 py-1 rounded font-body text-[12px] hover:bg-green-500/30"
+                              disabled={actionLoading === `${player.id}-confirmed`}
+                              className="bg-green-500/20 text-green-400 px-3 py-1 rounded font-body text-[12px] hover:bg-green-500/30 disabled:opacity-50"
                             >
-                              Aceptar
+                              {actionLoading === `${player.id}-confirmed` ? '...' : 'Aceptar'}
                             </button>
                             <button
                               onClick={() => handleRespondToInvitation(player.id, 'declined')}
-                              className="bg-red-500/20 text-red-400 px-3 py-1 rounded font-body text-[12px] hover:bg-red-500/30"
+                              disabled={actionLoading === `${player.id}-declined`}
+                              className="bg-red-500/20 text-red-400 px-3 py-1 rounded font-body text-[12px] hover:bg-red-500/30 disabled:opacity-50"
                             >
-                              Rechazar
+                              {actionLoading === `${player.id}-declined` ? '...' : 'Rechazar'}
                             </button>
                           </>
                         )}
@@ -315,15 +321,17 @@ export function PlayersManager({
                           <>
                             <button
                               onClick={() => handleRespondToInvitation(player.id, 'confirmed')}
-                              className="bg-green-500/20 text-green-400 px-3 py-1 rounded font-body text-[12px] hover:bg-green-500/30"
+                              disabled={actionLoading === `${player.id}-confirmed`}
+                              className="bg-green-500/20 text-green-400 px-3 py-1 rounded font-body text-[12px] hover:bg-green-500/30 disabled:opacity-50"
                             >
-                              Aprobar
+                              {actionLoading === `${player.id}-confirmed` ? '...' : 'Aprobar'}
                             </button>
                             <button
                               onClick={() => handleRemovePlayer(player.id)}
-                              className="bg-red-500/20 text-red-400 px-3 py-1 rounded font-body text-[12px] hover:bg-red-500/30"
+                              disabled={actionLoading === player.id}
+                              className="bg-red-500/20 text-red-400 px-3 py-1 rounded font-body text-[12px] hover:bg-red-500/30 disabled:opacity-50"
                             >
-                              Rechazar
+                              {actionLoading === player.id ? '...' : 'Rechazar'}
                             </button>
                           </>
                         )}
