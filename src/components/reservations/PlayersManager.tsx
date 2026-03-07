@@ -30,7 +30,9 @@ export function PlayersManager({
   const router = useRouter();
 
   const isOwner = currentUserId === reservationOwnerId;
-  const isInvited = players.some((p) => p.user_id === currentUserId);
+  const isInvitedAndConfirmed = players.some(
+    (p) => p.user_id === currentUserId && p.status === 'confirmed'
+  );
 
   const confirmedPlayers = players.filter((p) => p.status === 'confirmed');
   const pendingPlayers = players.filter((p) => p.status === 'pending');
@@ -173,8 +175,8 @@ export function PlayersManager({
     return player.status === 'confirmed' ? 'Confirmado' : 'Pendiente';
   };
 
-  if (!isOwner && !isInvited) {
-    return null; // Don't show this section to non-owners/non-invited users
+  if (!isOwner && !isInvitedAndConfirmed) {
+    return null; // Don't show this section to non-owners/non-confirmed users
   }
 
   return (

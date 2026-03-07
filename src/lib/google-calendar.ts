@@ -190,11 +190,29 @@ export function formatReservationForCalendar(reservation: {
   const courtName = reservation.courts?.name || 'Cancha';
   const courtType = reservation.courts?.type || '';
 
+  const customerName = reservation.customer_name || 'Sin nombre';
+
+  // Format time as HH:MM (e.g., "23:00")
+  const timeStr = reservation.start_time.substring(0, 5);
+
+  // Format duration (e.g., "1 hora", "1:30 horas")
+  const hours = Math.floor(reservation.duration_minutes / 60);
+  const minutes = reservation.duration_minutes % 60;
+  let durationStr = '';
+  if (hours > 0 && minutes > 0) {
+    durationStr = `${hours}:${minutes.toString().padStart(2, '0')} horas`;
+  } else if (hours > 0) {
+    durationStr = `${hours} hora${hours > 1 ? 's' : ''}`;
+  } else {
+    durationStr = `${minutes} min`;
+  }
+
   return {
-    summary: `Reserva: ${courtName} ${courtType}`,
+    summary: `${courtName} (${customerName}) ${durationStr}`,
     description: `
-Cliente: ${reservation.customer_name || 'Sin nombre'}
+Cliente: ${customerName}
 Email: ${reservation.customer_email || 'Sin email'}
+Cancha: ${courtName} ${courtType}
 ${reservation.notes ? `Notas: ${reservation.notes}` : ''}
 
 Reserva creada desde Polideportivo Ombú

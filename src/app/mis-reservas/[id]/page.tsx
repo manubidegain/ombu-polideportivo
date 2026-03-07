@@ -48,12 +48,13 @@ export default async function MyReservationDetailPage({ params }: ReservationDet
     .select('*')
     .eq('reservation_id', id)
     .eq('user_id', currentUserId)
-    .single();
+    .maybeSingle();
 
-  const isInvited = !!playerInvitation;
+  const isInvitedAndConfirmed = playerInvitation?.status === 'confirmed';
 
-  if (!isOwner && !isInvited) {
+  if (!isOwner && !isInvitedAndConfirmed) {
     // User doesn't have access to this reservation
+    // Either not invited or invitation is still pending
     redirect('/mis-reservas');
   }
 

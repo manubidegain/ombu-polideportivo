@@ -32,6 +32,7 @@ export function TeamsManager({
   const router = useRouter();
 
   const isOwner = currentUserId === reservationOwnerId;
+  const isInvitedPlayer = confirmedPlayers.some((p) => p.user_id === currentUserId);
 
   const teamAPlayers = confirmedPlayers.filter((p) => p.team_assignment === 'team_a');
   const teamBPlayers = confirmedPlayers.filter((p) => p.team_assignment === 'team_b');
@@ -154,12 +155,17 @@ export function TeamsManager({
     );
   };
 
+  // Only show to owner or confirmed players
+  if (!isOwner && !isInvitedPlayer) {
+    return null;
+  }
+
   if (confirmedPlayers.length === 0) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-lg p-6">
         <h2 className="font-heading text-[24px] text-white mb-4">EQUIPOS</h2>
         <p className="text-center font-body text-[14px] text-gray-400 py-8">
-          Invita jugadores y espera confirmación para formar equipos
+          {isOwner ? 'Invita jugadores y espera confirmación para formar equipos' : 'Aún no hay jugadores confirmados'}
         </p>
       </div>
     );

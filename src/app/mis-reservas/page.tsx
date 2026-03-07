@@ -23,7 +23,7 @@ export default async function MisReservasPage() {
     )
     .eq('user_id', user.id);
 
-  // Get reservations where user is invited as a player
+  // Get reservations where user is invited as a player (only confirmed)
   const { data: invitedPlayers } = await supabase
     .from('reservation_players')
     .select(
@@ -36,7 +36,7 @@ export default async function MisReservasPage() {
     `
     )
     .eq('user_id', user.id)
-    .in('status', ['confirmed', 'pending']);
+    .eq('status', 'confirmed');
 
   // Combine both lists and remove duplicates
   const invitedReservations = invitedPlayers

@@ -140,9 +140,28 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
         return timeslot.start_time >= blocked.start_time && timeslot.start_time < blocked.end_time;
       });
 
-      // Count existing reservations
+      // Helper to check if time ranges overlap
+      // Matches PostgreSQL OVERLAPS behavior: consecutive reservations are allowed
+      // (10:00-11:00 and 11:00-12:00 do NOT overlap)
+      const doTimesOverlap = (start1: string, duration1: number, start2: string, duration2: number) => {
+        const [h1, m1] = start1.split(':').map(Number);
+        const [h2, m2] = start2.split(':').map(Number);
+
+        const start1Minutes = h1 * 60 + m1;
+        const end1Minutes = start1Minutes + duration1;
+        const start2Minutes = h2 * 60 + m2;
+        const end2Minutes = start2Minutes + duration2;
+
+        // Ranges overlap if: (start1 < end2) AND (end1 > start2)
+        // This allows consecutive reservations where end1 === start2
+        return start1Minutes < end2Minutes && end1Minutes > start2Minutes;
+      };
+
+      // Count overlapping reservations
       const existingReservationsCount =
-        reservations?.filter((r) => r.start_time === timeslot.start_time).length || 0;
+        reservations?.filter((r) =>
+          doTimesOverlap(timeslot.start_time, timeslot.duration_minutes, r.start_time, r.duration_minutes)
+        ).length || 0;
 
       // Check availability
       const isAvailable =

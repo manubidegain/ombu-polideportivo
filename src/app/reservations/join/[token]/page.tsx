@@ -16,7 +16,7 @@ export default async function JoinReservationPage({ params }: JoinPageProps) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Find reservation by share token
-  const { data: reservation } = await supabase
+  const { data: reservation, error } = await supabase
     .from('reservations')
     .select(
       `
@@ -32,9 +32,10 @@ export default async function JoinReservationPage({ params }: JoinPageProps) {
     `
     )
     .eq('share_token', token)
-    .single();
+    .maybeSingle();
 
-  if (!reservation) {
+  if (error || !reservation) {
+    console.error('Error fetching reservation:', error);
     notFound();
   }
 
