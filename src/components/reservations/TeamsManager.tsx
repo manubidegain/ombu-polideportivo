@@ -243,7 +243,7 @@ export function TeamsManager({
                 className="bg-white/5 rounded p-2 flex items-center justify-between"
               >
                 <span className="font-body text-[14px] text-white">
-                  {player.user_id ? player.user_profiles?.full_name : player.invitation_email}
+                  {player.user_profiles?.full_name || player.invitation_email || 'Sin nombre'}
                 </span>
                 {isOwner && (
                   <div className="flex gap-1">
@@ -285,7 +285,7 @@ export function TeamsManager({
                 className="bg-white/5 rounded p-2 flex items-center justify-between"
               >
                 <span className="font-body text-[14px] text-white">
-                  {player.user_id ? player.user_profiles?.full_name : player.invitation_email}
+                  {player.user_profiles?.full_name || player.invitation_email || 'Sin nombre'}
                 </span>
                 {isOwner && (
                   <div className="flex gap-1">
@@ -329,7 +329,7 @@ export function TeamsManager({
                 className="bg-white/10 rounded px-3 py-2 flex items-center gap-2"
               >
                 <span className="font-body text-[14px] text-white">
-                  {player.user_id ? player.user_profiles?.full_name : player.invitation_email}
+                  {player.user_profiles?.full_name || player.invitation_email || 'Sin nombre'}
                 </span>
                 {isOwner && (
                   <div className="flex gap-1">

@@ -116,52 +116,72 @@ export function PlayersManager({
 
   const handleRemovePlayer = async (playerId: string) => {
     setActionLoading(playerId);
+
+    const promise = (async () => {
+      const supabase = createClient();
+      const { error } = await supabase.from('reservation_players').delete().eq('id', playerId);
+
+      if (error) {
+        console.error('Error removing player:', error);
+        throw error;
+      }
+
+      // Update local state immediately
+      setPlayers(players.filter(p => p.id !== playerId));
+    })();
+
     toast.promise(
-      (async () => {
-        const supabase = createClient();
-        const { error } = await supabase.from('reservation_players').delete().eq('id', playerId);
-
-        if (error) {
-          console.error('Error removing player:', error);
-          throw error;
-        }
-
-        router.refresh();
-      })(),
+      promise,
       {
         loading: 'Eliminando invitación...',
         success: 'Invitación eliminada correctamente',
         error: 'Error al eliminar invitación',
       }
-    ).finally(() => setActionLoading(null));
+    );
+
+    await promise;
+    setActionLoading(null);
+    router.refresh();
   };
 
   const handleRespondToInvitation = async (playerId: string, status: 'confirmed' | 'declined') => {
     setActionLoading(`${playerId}-${status}`);
+
+    const promise = (async () => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('reservation_players')
+        .update({
+          status,
+          responded_at: new Date().toISOString(),
+        })
+        .eq('id', playerId);
+
+      if (error) {
+        console.error('Error responding to invitation:', error);
+        throw error;
+      }
+
+      // Update local state immediately
+      setPlayers(players.map(p =>
+        p.id === playerId
+          ? { ...p, status, responded_at: new Date().toISOString() }
+          : p
+      ));
+    })();
+
     toast.promise(
-      (async () => {
-        const supabase = createClient();
-        const { error } = await supabase
-          .from('reservation_players')
-          .update({
-            status,
-            responded_at: new Date().toISOString(),
-          })
-          .eq('id', playerId);
-
-        if (error) {
-          console.error('Error responding to invitation:', error);
-          throw error;
-        }
-
-        router.refresh();
-      })(),
+      promise,
       {
         loading: 'Procesando respuesta...',
         success: status === 'confirmed' ? 'Invitación aceptada' : 'Invitación rechazada',
         error: 'Error al responder invitación',
       }
-    ).finally(() => setActionLoading(null));
+    );
+
+    await promise;
+    setActionLoading(null);
+    router.refresh();
   };
 
   const getPlayerDisplay = (player: ReservationPlayer) => {
