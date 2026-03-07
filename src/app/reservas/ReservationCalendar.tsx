@@ -251,7 +251,7 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
       const userPhone = profile?.phone || '';
 
       // Create reservation
-      const { error } = await supabase.from('reservations').insert([
+      const { data: newReservation, error } = await supabase.from('reservations').insert([
         {
           user_id: userId,
           court_id: selectedCourt,
@@ -267,9 +267,20 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
           requires_lighting: selectedSlot.requires_lighting || false,
           payment_status: 'pending',
         },
-      ]);
+      ]).select().single();
 
       if (error) throw error;
+
+      // Sync with Google Calendar (fire and forget, don't block on failure)
+      if (newReservation) {
+        fetch('/api/calendar/sync-reservation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reservationId: newReservation.id,
+          }),
+        }).catch(err => console.error('Failed to sync with Google Calendar:', err));
+      }
 
       // Send confirmation email (don't wait for it, fire and forget)
       fetch('/api/reservations/send-confirmation', {

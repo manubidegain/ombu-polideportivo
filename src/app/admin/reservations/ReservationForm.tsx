@@ -273,15 +273,26 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
 
       if (!formData.is_recurring) {
         // Simple reservation
-        const { error: insertError } = await supabase.from('reservations').insert([
+        const { data: newReservation, error: insertError } = await supabase.from('reservations').insert([
           {
             ...baseReservation,
             reservation_date: formData.reservation_date,
             is_recurring: false,
           },
-        ]);
+        ]).select().single();
 
         if (insertError) throw insertError;
+
+        // Sync with Google Calendar (fire and forget)
+        if (newReservation) {
+          fetch('/api/calendar/sync-reservation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reservationId: newReservation.id,
+            }),
+          }).catch(err => console.error('Failed to sync with Google Calendar:', err));
+        }
       } else {
         // Recurring reservation
         if (!formData.recurrence_end_date) {
@@ -364,11 +375,36 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
         }));
 
         if (childReservations.length > 0) {
-          const { error: childError } = await supabase
+          const { data: createdChildren, error: childError } = await supabase
             .from('reservations')
-            .insert(childReservations);
+            .insert(childReservations)
+            .select();
 
           if (childError) throw childError;
+
+          // Sync all child reservations with Google Calendar
+          if (createdChildren) {
+            createdChildren.forEach((reservation) => {
+              fetch('/api/calendar/sync-reservation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  reservationId: reservation.id,
+                }),
+              }).catch(err => console.error('Failed to sync child reservation with Google Calendar:', err));
+            });
+          }
+        }
+
+        // Sync parent reservation with Google Calendar
+        if (parentReservation) {
+          fetch('/api/calendar/sync-reservation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reservationId: parentReservation.id,
+            }),
+          }).catch(err => console.error('Failed to sync parent reservation with Google Calendar:', err));
         }
       }
 
