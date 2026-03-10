@@ -155,11 +155,12 @@ export default async function TorneosPage() {
             const systemTournament = monthTournaments[0];
             // Use system tournament if exists, otherwise show design template
             const isEnabled = month.enabled;
+            const canRegister = systemTournament && systemTournament.status === 'registration_open';
 
             return (
               <div
                 key={month.number}
-                className={`border-[3px] md:border-[5px] flex flex-col md:flex-row items-stretch min-h-[120px] md:h-[87px] ${
+                className={`border-[3px] md:border-[5px] flex flex-col md:flex-row items-stretch min-h-[120px] ${
                   isEnabled ? 'border-[#1b1b1b]' : 'border-[#3e3d3d]'
                 }`}
               >
@@ -185,8 +186,8 @@ export default async function TorneosPage() {
                     </p>
                   </div>
 
-                  {/* Tournament Name */}
-                  <div className="flex items-center justify-center flex-1 px-4 py-3 md:py-0 border-t md:border-t-0 border-[#ededed]">
+                  {/* Tournament Name and Action */}
+                  <div className="flex items-center justify-between md:justify-center gap-4 flex-1 px-4 py-3 md:py-0 border-t md:border-t-0 border-[#ededed]">
                     <p
                       className={`font-body text-[16px] md:text-[24px] font-medium text-center ${
                         isEnabled ? 'text-[#1b1b1b]' : 'text-[#3e3d3d]'
@@ -194,6 +195,16 @@ export default async function TorneosPage() {
                     >
                       {systemTournament ? systemTournament.name.toUpperCase() : month.tournamentName}
                     </p>
+
+                    {/* Registration Button */}
+                    {canRegister && (
+                      <Link
+                        href={`/torneos/${systemTournament.id}`}
+                        className="bg-[#1b1b1b] text-white font-body text-[12px] md:text-[14px] py-2 px-4 md:px-6 rounded hover:bg-[#2b2b2b] transition-colors whitespace-nowrap"
+                      >
+                        INSCRIBIRSE
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

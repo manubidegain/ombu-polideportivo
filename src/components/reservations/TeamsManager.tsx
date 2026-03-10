@@ -111,51 +111,53 @@ export function TeamsManager({
 
   const handleMovePlayer = async (playerId: string, toTeam: 'team_a' | 'team_b' | 'unassigned') => {
     setActionLoading(`${playerId}-${toTeam}`);
-    toast.promise(
-      (async () => {
-        const supabase = createClient();
-        const { error } = await supabase
-          .from('reservation_players')
-          .update({ team_assignment: toTeam })
-          .eq('id', playerId);
+    const promise = (async () => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('reservation_players')
+        .update({ team_assignment: toTeam })
+        .eq('id', playerId);
 
-        if (error) {
-          console.error('Error moving player:', error);
-          throw error;
-        }
-
-        router.refresh();
-      })(),
-      {
-        loading: 'Moviendo jugador...',
-        success: 'Jugador movido',
-        error: 'Error al mover jugador',
+      if (error) {
+        console.error('Error moving player:', error);
+        throw error;
       }
-    ).finally(() => setActionLoading(null));
+
+      router.refresh();
+    })();
+
+    toast.promise(promise, {
+      loading: 'Moviendo jugador...',
+      success: 'Jugador movido',
+      error: 'Error al mover jugador',
+    });
+
+    promise.finally(() => setActionLoading(null));
   };
 
   const handleClearTeams = async () => {
     setActionLoading('clear');
-    toast.promise(
-      (async () => {
-        const supabase = createClient();
+    const promise = (async () => {
+      const supabase = createClient();
 
-        // Reset all players to unassigned
-        for (const player of confirmedPlayers) {
-          await supabase
-            .from('reservation_players')
-            .update({ team_assignment: 'unassigned' })
-            .eq('id', player.id);
-        }
-
-        router.refresh();
-      })(),
-      {
-        loading: 'Borrando equipos...',
-        success: 'Equipos borrados',
-        error: 'Error al borrar equipos',
+      // Reset all players to unassigned
+      for (const player of confirmedPlayers) {
+        await supabase
+          .from('reservation_players')
+          .update({ team_assignment: 'unassigned' })
+          .eq('id', player.id);
       }
-    ).finally(() => setActionLoading(null));
+
+      router.refresh();
+    })();
+
+    toast.promise(promise, {
+      loading: 'Borrando equipos...',
+      success: 'Equipos borrados',
+      error: 'Error al borrar equipos',
+    });
+
+    promise.finally(() => setActionLoading(null));
   };
 
   // Only show to owner or confirmed players

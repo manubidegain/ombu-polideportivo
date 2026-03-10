@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { TournamentStatusBadge } from '../TournamentStatusBadge';
 import { TournamentActions } from './TournamentActions';
+import { CategoryManager } from './CategoryManager';
+import { TimeSlotManager } from './TimeSlotManager';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -41,6 +43,7 @@ export default async function TournamentDetailPage({
         start_time,
         end_time,
         is_active,
+        court_id,
         courts (name)
       )
     `
@@ -51,6 +54,13 @@ export default async function TournamentDetailPage({
   if (error || !tournament) {
     notFound();
   }
+
+  // Fetch available courts
+  const { data: courts } = await supabase
+    .from('courts')
+    .select('*')
+    .eq('status', 'active')
+    .order('name');
 
   // Fetch registration counts by category
   const categoriesWithCounts = await Promise.all(
@@ -71,8 +81,6 @@ export default async function TournamentDetailPage({
     .select('*', { count: 'exact', head: true })
     .eq('tournament_id', id)
     .eq('status', 'confirmed');
-
-  const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
   return (
     <div className="min-h-screen bg-[#1b1b1b]">
@@ -171,78 +179,17 @@ export default async function TournamentDetailPage({
         </div>
 
         {/* Categories */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
-          <h2 className="font-heading text-[24px] text-white mb-6">
-            CATEGORÍAS ({categoriesWithCounts.length})
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categoriesWithCounts.map((category) => (
-              <div key={category.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                <h3 className="font-heading text-[18px] text-white mb-2">{category.name}</h3>
-                {category.description && (
-                  <p className="font-body text-[14px] text-gray-400 mb-3">{category.description}</p>
-                )}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-[12px] text-gray-400">Inscriptos</span>
-                    <span
-                      className={`font-body text-[14px] ${
-                        category.registrations_count >= category.max_teams
-                          ? 'text-red-400'
-                          : category.registrations_count >= category.min_teams
-                            ? 'text-green-400'
-                            : 'text-yellow-400'
-                      }`}
-                    >
-                      {category.registrations_count} / {category.max_teams}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-[12px] text-gray-400">Mínimo requerido</span>
-                    <span className="font-body text-[14px] text-white">{category.min_teams}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="mb-8">
+          <CategoryManager tournamentId={id} categories={categoriesWithCounts} />
         </div>
 
         {/* Time Slots */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-          <h2 className="font-heading text-[24px] text-white mb-6">
-            HORARIOS DISPONIBLES ({tournament.tournament_time_slots?.length || 0})
-          </h2>
-          {tournament.tournament_time_slots && tournament.tournament_time_slots.length > 0 ? (
-            <div className="space-y-3">
-              {tournament.tournament_time_slots
-                .sort((a, b) => a.day_of_week - b.day_of_week)
-                .map((slot) => (
-                  <div
-                    key={slot.id}
-                    className="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg p-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <p className="font-body text-[14px] text-white">{dayNames[slot.day_of_week]}</p>
-                        <p className="font-body text-[12px] text-gray-400">{slot.courts?.name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <p className="font-body text-[14px] text-white">
-                        {slot.start_time.substring(0, 5)} - {slot.end_time.substring(0, 5)}
-                      </p>
-                      {!slot.is_active && (
-                        <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded font-body text-[10px]">
-                          INACTIVO
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ) : (
-            <p className="font-body text-[14px] text-gray-400">No hay horarios configurados</p>
-          )}
+        <div className="mb-8">
+          <TimeSlotManager
+            tournamentId={id}
+            timeSlots={tournament.tournament_time_slots || []}
+            courts={courts || []}
+          />
         </div>
 
         {/* Registrations Summary */}

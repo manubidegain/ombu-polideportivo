@@ -551,6 +551,72 @@ export type Database = {
           },
         ]
       }
+      tournament_invitations: {
+        Row: {
+          category_id: string
+          contact_phone: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invitee_email: string
+          invitee_id: string | null
+          inviter_email: string
+          inviter_id: string
+          responded_at: string | null
+          status: string | null
+          team_name: string
+          tournament_id: string
+          unavailable_slot_ids: string[] | null
+        }
+        Insert: {
+          category_id: string
+          contact_phone?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invitee_email: string
+          invitee_id?: string | null
+          inviter_email: string
+          inviter_id: string
+          responded_at?: string | null
+          status?: string | null
+          team_name: string
+          tournament_id: string
+          unavailable_slot_ids?: string[] | null
+        }
+        Update: {
+          category_id?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invitee_email?: string
+          invitee_id?: string | null
+          inviter_email?: string
+          inviter_id?: string
+          responded_at?: string | null
+          status?: string | null
+          team_name?: string
+          tournament_id?: string
+          unavailable_slot_ids?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_invitations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_invitations_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_matches: {
         Row: {
           completed_at: string | null
@@ -664,6 +730,7 @@ export type Database = {
           payment_amount: number | null
           payment_date: string | null
           payment_status: string | null
+          player_names: Json | null
           player1_id: string
           player2_id: string | null
           registered_at: string | null
@@ -681,6 +748,7 @@ export type Database = {
           payment_amount?: number | null
           payment_date?: string | null
           payment_status?: string | null
+          player_names?: Json | null
           player1_id: string
           player2_id?: string | null
           registered_at?: string | null
@@ -698,6 +766,7 @@ export type Database = {
           payment_amount?: number | null
           payment_date?: string | null
           payment_status?: string | null
+          player_names?: Json | null
           player1_id?: string
           player2_id?: string | null
           registered_at?: string | null

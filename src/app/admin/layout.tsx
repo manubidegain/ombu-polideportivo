@@ -60,6 +60,12 @@ export default async function AdminLayout({
                 Reservas
               </Link>
               <Link
+                href="/admin/torneos"
+                className="font-body text-[14px] text-white hover:text-[#dbf228] transition-colors"
+              >
+                Torneos
+              </Link>
+              <Link
                 href="/admin/blocked-dates"
                 className="font-body text-[14px] text-white hover:text-[#dbf228] transition-colors"
               >

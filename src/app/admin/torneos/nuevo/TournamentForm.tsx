@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Tables } from '@/types/database.types';
@@ -31,6 +31,11 @@ export function TournamentForm({ courts }: TournamentFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<FormStep>('basic');
   const [loading, setLoading] = useState(false);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   // Basic info
   const [name, setName] = useState('');
