@@ -198,12 +198,26 @@ export default async function TournamentDetailPage({
             <h2 className="font-heading text-[24px] text-white">INSCRIPCIONES</h2>
             <span className="font-heading text-[32px] text-[#dbf228]">{totalRegistrations || 0}</span>
           </div>
-          <Link
-            href={`/admin/torneos/${id}/inscripciones`}
-            className="inline-block bg-[#dbf228] text-[#1b1b1b] font-heading text-[14px] py-2 px-6 rounded hover:bg-[#c5db23] transition-colors"
-          >
-            VER INSCRIPCIONES
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href={`/admin/torneos/${id}/inscripciones`}
+              className="inline-block bg-[#dbf228] text-[#1b1b1b] font-heading text-[14px] py-2 px-6 rounded hover:bg-[#c5db23] transition-colors"
+            >
+              VER INSCRIPCIONES
+            </Link>
+            <Link
+              href={`/admin/torneos/${id}/fixtures`}
+              className="inline-block bg-white/10 text-white border border-white/20 font-heading text-[14px] py-2 px-6 rounded hover:bg-white/20 transition-colors"
+            >
+              GESTIONAR FIXTURE
+            </Link>
+            <Link
+              href={`/admin/torneos/${id}/galeria`}
+              className="inline-block bg-white/10 text-white border border-white/20 font-heading text-[14px] py-2 px-6 rounded hover:bg-white/20 transition-colors"
+            >
+              GALERÍA DE FOTOS
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -176,6 +176,54 @@ export type Database = {
         }
         Relationships: []
       }
+      player_achievements: {
+        Row: {
+          achievement_type: string
+          awarded_at: string | null
+          category_id: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          tournament_id: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_type: string
+          awarded_at?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          tournament_id?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_type?: string
+          awarded_at?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          tournament_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_achievements_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_achievements_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_rules: {
         Row: {
           court_id: string | null
@@ -717,6 +765,53 @@ export type Database = {
             columns: ["winner_id"]
             isOneToOne: false
             referencedRelation: "tournament_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_photos: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          display_order: number | null
+          file_name: string
+          file_path: string
+          id: string
+          is_featured: boolean | null
+          tournament_id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_name: string
+          file_path: string
+          id?: string
+          is_featured?: boolean | null
+          tournament_id: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_featured?: boolean | null
+          tournament_id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_photos_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
             referencedColumns: ["id"]
           },
         ]

@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
+import MatchCard from '@/components/tournaments/MatchCard';
+import { BadgesDisplay, AchievementStats } from '@/components/tournaments/BadgesDisplay';
+import { getUserAchievements } from '@/lib/tournaments/achievements';
 
 export default async function MyTournamentsPage() {
   const user = await getCurrentUser();
@@ -79,6 +82,88 @@ export default async function MyTournamentsPage() {
     .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
     .order('created_at', { ascending: false });
 
+  // Get all team IDs where user is a player
+  const userTeamIds = registrations?.map((reg) => reg.id) || [];
+
+  // Fetch matches where user's team is participating
+  const { data: matches } = userTeamIds.length > 0
+    ? await supabase
+        .from('tournament_matches')
+        .select(
+          `
+          *,
+          tournament:tournaments!tournament_matches_tournament_id_fkey (
+            id,
+            name,
+            sport_type
+          ),
+          team1:tournament_registrations!tournament_matches_team1_id_fkey (
+            id,
+            team_name,
+            player_names
+          ),
+          team2:tournament_registrations!tournament_matches_team2_id_fkey (
+            id,
+            team_name,
+            player_names
+          ),
+          court:courts (
+            name
+          ),
+          series:tournament_series (
+            name,
+            phase
+          )
+        `
+        )
+        .or(`team1_id.in.(${userTeamIds.join(',')}),team2_id.in.(${userTeamIds.join(',')})`)
+        .order('scheduled_date', { ascending: true })
+        .order('scheduled_time', { ascending: true })
+    : { data: null };
+
+  // Separate matches into upcoming and completed
+  const today = new Date().toISOString().split('T')[0];
+
+  // Transform matches to ensure non-null required fields
+  const transformedMatches = matches?.filter(
+    (match) =>
+      match.status &&
+      match.tournament &&
+      match.team1 && match.team1.team_name &&
+      match.team2 && match.team2.team_name
+  ).map((match) => ({
+    ...match,
+    status: match.status as string,
+    tournament: match.tournament!,
+    team1: {
+      id: match.team1!.id,
+      team_name: match.team1!.team_name as string,
+      player_names: Array.isArray(match.team1!.player_names)
+        ? (match.team1!.player_names as string[])
+        : [],
+    },
+    team2: {
+      id: match.team2!.id,
+      team_name: match.team2!.team_name as string,
+      player_names: Array.isArray(match.team2!.player_names)
+        ? (match.team2!.player_names as string[])
+        : [],
+    },
+  })) || [];
+
+  const upcomingMatches = transformedMatches.filter(
+    (match) =>
+      match.status === 'scheduled' &&
+      match.scheduled_date &&
+      match.scheduled_date >= today
+  );
+  const completedMatches = transformedMatches.filter(
+    (match) => match.status === 'completed'
+  );
+
+  // Fetch user achievements
+  const achievements = await getUserAchievements(user.id);
+
   const getStatusBadge = (status: string | null) => {
     const badges = {
       pending: 'bg-yellow-500/20 text-yellow-600',
@@ -111,9 +196,72 @@ export default async function MyTournamentsPage() {
         <div className="mb-8">
           <h1 className="font-heading text-[48px] text-[#1b1b1b] mb-2">MIS TORNEOS</h1>
           <p className="font-body text-[16px] text-gray-600">
-            Invitaciones y equipos registrados
+            Partidos, logros, invitaciones y equipos registrados
           </p>
         </div>
+
+        {/* Achievements Section */}
+        {achievements.length > 0 && (
+          <div className="bg-gradient-to-br from-[#1b1b1b] to-[#2b2b2b] rounded-lg p-6 shadow-lg mb-6">
+            <h2 className="font-heading text-[24px] text-white mb-4">MIS LOGROS 🏆</h2>
+            <BadgesDisplay achievements={achievements} compact={true} />
+            <Link
+              href="/mis-logros"
+              className="inline-block mt-4 font-body text-[14px] text-[#dbf228] hover:underline"
+            >
+              Ver todos los logros →
+            </Link>
+          </div>
+        )}
+
+        {/* My Matches Section */}
+        {matches && matches.length > 0 && (
+          <>
+            {/* Upcoming Matches */}
+            <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+              <h2 className="font-heading text-[24px] text-[#1b1b1b] mb-4">
+                PRÓXIMOS PARTIDOS ({upcomingMatches.length})
+              </h2>
+
+              {upcomingMatches.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingMatches.map((match) => {
+                    const userTeamId = userTeamIds.find(
+                      (id) => id === match.team1_id || id === match.team2_id
+                    );
+                    return userTeamId ? (
+                      <MatchCard key={match.id} match={match} userTeamId={userTeamId} />
+                    ) : null;
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-gray-600 py-8">
+                  No tienes partidos programados
+                </p>
+              )}
+            </div>
+
+            {/* Completed Matches */}
+            {completedMatches.length > 0 && (
+              <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+                <h2 className="font-heading text-[24px] text-[#1b1b1b] mb-4">
+                  PARTIDOS FINALIZADOS ({completedMatches.length})
+                </h2>
+
+                <div className="space-y-3">
+                  {completedMatches.map((match) => {
+                    const userTeamId = userTeamIds.find(
+                      (id) => id === match.team1_id || id === match.team2_id
+                    );
+                    return userTeamId ? (
+                      <MatchCard key={match.id} match={match} userTeamId={userTeamId} />
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Invitations Sent */}
         <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
