@@ -192,23 +192,48 @@ export function RegistrationForm({
       ) as string[];
 
       // Create invitation
-      const { error } = await supabase.from('tournament_invitations').insert({
-        tournament_id: tournamentId,
-        category_id: categoryId,
-        team_name: teamName,
-        inviter_id: user.id,
-        inviter_email: userEmail,
-        invitee_email: partnerEmail,
-        contact_phone: contactPhone || null,
-        unavailable_slot_ids: unavailableParentSlots.length > 0 ? unavailableParentSlots : null,
-        status: 'pending',
-      });
+      const { data: invitationData, error } = await supabase
+        .from('tournament_invitations')
+        .insert({
+          tournament_id: tournamentId,
+          category_id: categoryId,
+          team_name: teamName,
+          inviter_id: user.id,
+          inviter_email: userEmail,
+          invitee_email: partnerEmail,
+          contact_phone: contactPhone || null,
+          unavailable_slot_ids: unavailableParentSlots.length > 0 ? unavailableParentSlots : null,
+          status: 'pending',
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast.success(
-        `¡Invitación enviada! ${partnerEmail} recibirá un email para aceptar la inscripción.`
-      );
+      // Send invitation email
+      try {
+        const emailResponse = await fetch('/api/send-tournament-invitation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invitationId: invitationData.id }),
+        });
+
+        if (!emailResponse.ok) {
+          console.error('Failed to send email, but invitation was created');
+          toast.success(
+            `Invitación creada. Comparte este enlace con ${partnerEmail} para que acepte.`
+          );
+        } else {
+          toast.success(
+            `¡Invitación enviada! ${partnerEmail} recibirá un email para aceptar la inscripción.`
+          );
+        }
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        toast.success(
+          `Invitación creada. Comparte este enlace con ${partnerEmail} para que acepte.`
+        );
+      }
 
       // Reset form
       setTeamName('');
