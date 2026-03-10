@@ -125,6 +125,16 @@ export default async function TournamentPublicPage({
               <p className="font-heading text-[24px]">${tournament.registration_price}</p>
             </div>
           </div>
+
+          {/* Gallery Link */}
+          <div className="mt-6">
+            <Link
+              href={`/torneos/${id}/galeria`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-body text-[14px] transition-colors"
+            >
+              📸 Ver Galería de Fotos
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -104,6 +104,15 @@ export default function UserMenu() {
               {/* Menu Items */}
               <div className="py-2">
                 <Link
+                  href="/perfil"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="font-body text-[14px] text-white">Mi Perfil</span>
+                </Link>
+
+                <Link
                   href="/mis-reservas"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors"

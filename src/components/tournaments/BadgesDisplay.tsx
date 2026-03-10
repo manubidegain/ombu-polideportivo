@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ACHIEVEMENT_DEFINITIONS } from '@/lib/tournaments/achievements';
+import { ACHIEVEMENT_DEFINITIONS } from '@/lib/tournaments/achievement-definitions';
 
 type Achievement = {
   id: string;
