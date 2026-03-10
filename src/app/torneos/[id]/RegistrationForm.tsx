@@ -375,7 +375,7 @@ export function RegistrationForm({
               Marca los bloques de {matchDurationMinutes} minutos donde <strong>NO</strong> puedes jugar
             </p>
             <p className="font-body text-[12px] text-gray-500 mb-4">
-              💡 Ahora puedes seleccionar bloques específicos en lugar de horarios completos
+              ⚠️ Marca solo impedimentos reales (trabajo, viajes, compromisos ineludibles), no preferencias personales
             </p>
           </div>
 
