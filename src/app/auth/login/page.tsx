@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 function LoginForm() {
   const router = useRouter();
@@ -38,6 +39,8 @@ function LoginForm() {
     router.refresh();
   };
 
+  const redirectTo = searchParams.get('redirect') || undefined;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1b1b1b] px-4">
       <div className="max-w-md w-full space-y-8">
@@ -48,6 +51,21 @@ function LoginForm() {
           <p className="mt-2 text-center font-body text-[16px] text-gray-400">
             Accede a tu cuenta de Polideportivo Ombú
           </p>
+        </div>
+
+        {/* Google Sign In */}
+        <div className="space-y-4">
+          <GoogleSignInButton mode="signin" redirectTo={redirectTo} />
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-[#1b1b1b] text-gray-400">O continúa con email</span>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
@@ -100,7 +118,12 @@ function LoginForm() {
             {loading ? 'INGRESANDO...' : 'INGRESAR'}
           </button>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <p className="font-body text-[14px] text-gray-400">
+              <Link href="/auth/reset-password" className="text-[#dbf228] hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </p>
             <p className="font-body text-[14px] text-gray-400">
               ¿No tienes una cuenta?{' '}
               <Link href="/auth/signup" className="text-[#dbf228] hover:underline">
