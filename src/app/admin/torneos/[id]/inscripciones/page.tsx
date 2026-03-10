@@ -46,6 +46,22 @@ export default async function TournamentRegistrationsPage({
     .eq('tournament_id', id)
     .order('registered_at', { ascending: false });
 
+  // Fetch pending invitations (not yet accepted)
+  const { data: pendingInvitations } = await supabase
+    .from('tournament_invitations')
+    .select(
+      `
+      *,
+      tournament_categories (
+        id,
+        name
+      )
+    `
+    )
+    .eq('tournament_id', id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
   // Group registrations by status
   const confirmed = registrations?.filter((r) => r.status === 'confirmed') || [];
   const pending = registrations?.filter((r) => r.status === 'pending') || [];
@@ -86,7 +102,7 @@ export default async function TournamentRegistrationsPage({
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -106,12 +122,73 @@ export default async function TournamentRegistrationsPage({
           <div className="bg-white/5 border border-white/10 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
+                <p className="font-body text-[12px] text-gray-400 mb-1">Invitaciones Pendientes</p>
+                <p className="font-heading text-[32px] text-blue-400">{pendingInvitations?.length || 0}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
                 <p className="font-body text-[12px] text-gray-400 mb-1">Canceladas</p>
                 <p className="font-heading text-[32px] text-red-400">{cancelled.length}</p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Pending Invitations */}
+        {pendingInvitations && pendingInvitations.length > 0 && (
+          <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
+            <h2 className="font-heading text-[24px] text-white mb-6">
+              INVITACIONES PENDIENTES ({pendingInvitations.length})
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">EQUIPO</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">CATEGORÍA</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">INVITADOR</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">INVITADO</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">FECHA</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">ESTADO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingInvitations.map((invitation) => (
+                    <tr key={invitation.id} className="border-b border-white/5">
+                      <td className="py-4">
+                        <p className="font-body text-[14px] text-white">{invitation.team_name}</p>
+                      </td>
+                      <td className="py-4">
+                        <p className="font-body text-[14px] text-white">
+                          {invitation.tournament_categories?.name || 'N/A'}
+                        </p>
+                      </td>
+                      <td className="py-4">
+                        <p className="font-body text-[12px] text-white">{invitation.inviter_email}</p>
+                      </td>
+                      <td className="py-4">
+                        <p className="font-body text-[12px] text-white">{invitation.invitee_email}</p>
+                      </td>
+                      <td className="py-4">
+                        <p className="font-body text-[12px] text-gray-400">
+                          {invitation.created_at ? format(new Date(invitation.created_at), "d MMM yyyy", { locale: es }) : 'N/A'}
+                        </p>
+                      </td>
+                      <td className="py-4">
+                        <span className="px-2 py-1 rounded font-body text-[12px] bg-blue-500/20 text-blue-400">
+                          Esperando respuesta
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Registrations List */}
         <div className="bg-white/5 border border-white/10 rounded-lg p-6">
