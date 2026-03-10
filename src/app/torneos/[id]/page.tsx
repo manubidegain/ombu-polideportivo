@@ -239,6 +239,7 @@ export default async function TournamentPublicPage({
                   categories={categoriesWithCounts}
                   sportType={tournament.sport_type as 'padel' | 'futbol'}
                   timeSlots={tournament.tournament_time_slots || []}
+                  matchDurationMinutes={tournament.match_duration_minutes || 60}
                 />
               )}
             </div>

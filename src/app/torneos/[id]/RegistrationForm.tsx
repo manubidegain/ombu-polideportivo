@@ -23,11 +23,21 @@ interface TimeSlot {
   courts: { name: string } | null;
 }
 
+interface SubSlot {
+  parentId: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  court_name: string | null;
+  displayKey: string; // unique key for this sub-slot
+}
+
 interface RegistrationFormProps {
   tournamentId: string;
   categories: Category[];
   sportType: 'padel' | 'futbol';
   timeSlots: TimeSlot[];
+  matchDurationMinutes?: number; // Duration of each match
 }
 
 export function RegistrationForm({
@@ -35,6 +45,7 @@ export function RegistrationForm({
   categories,
   sportType,
   timeSlots,
+  matchDurationMinutes = 60, // Default 60 minutes
 }: RegistrationFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -47,9 +58,55 @@ export function RegistrationForm({
   const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
   const [partnerEmail, setPartnerEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
-  const [unavailableSlots, setUnavailableSlots] = useState<string[]>([]);
+  const [unavailableSlots, setUnavailableSlots] = useState<string[]>([]); // Now stores displayKeys
+  const [subSlots, setSubSlots] = useState<SubSlot[]>([]);
 
   const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  // Function to split time slots into smaller sub-slots
+  const generateSubSlots = (slots: TimeSlot[], duration: number): SubSlot[] => {
+    const result: SubSlot[] = [];
+
+    slots.forEach((slot) => {
+      // Parse start and end times
+      const [startHour, startMin] = slot.start_time.split(':').map(Number);
+      const [endHour, endMin] = slot.end_time.split(':').map(Number);
+
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      // Generate sub-slots
+      for (let time = startMinutes; time < endMinutes; time += duration) {
+        const subStartHour = Math.floor(time / 60);
+        const subStartMin = time % 60;
+        const subEndHour = Math.floor((time + duration) / 60);
+        const subEndMin = (time + duration) % 60;
+
+        // Don't create sub-slot that goes beyond the original slot
+        if (time + duration > endMinutes) break;
+
+        const subStart = `${String(subStartHour).padStart(2, '0')}:${String(subStartMin).padStart(2, '0')}`;
+        const subEnd = `${String(subEndHour).padStart(2, '0')}:${String(subEndMin).padStart(2, '0')}`;
+
+        result.push({
+          parentId: slot.id,
+          day_of_week: slot.day_of_week,
+          start_time: subStart,
+          end_time: subEnd,
+          court_name: slot.courts?.name || null,
+          displayKey: `${slot.id}-${subStart}`,
+        });
+      }
+    });
+
+    return result;
+  };
+
+  // Generate sub-slots when timeSlots or matchDuration changes
+  useEffect(() => {
+    const generated = generateSubSlots(timeSlots, matchDurationMinutes);
+    setSubSlots(generated);
+  }, [timeSlots, matchDurationMinutes]);
 
   // Check authentication on mount
   useEffect(() => {
@@ -106,14 +163,14 @@ export function RegistrationForm({
     }
 
     // Warn if too many unavailable slots
-    if (unavailableSlots.length >= timeSlots.length) {
+    if (unavailableSlots.length >= subSlots.length) {
       toast.error('No puedes marcar todos los horarios como no disponibles');
       return;
     }
 
-    if (unavailableSlots.length > timeSlots.length * 0.7) {
+    if (unavailableSlots.length > subSlots.length * 0.7) {
       const confirmed = confirm(
-        `Has marcado ${unavailableSlots.length} de ${timeSlots.length} horarios como no disponibles. Esto puede dificultar la programación de partidos. ¿Deseas continuar?`
+        `Has marcado ${unavailableSlots.length} de ${subSlots.length} bloques como no disponibles. Esto puede dificultar la programación de partidos. ¿Deseas continuar?`
       );
       if (!confirmed) return;
     }
@@ -122,6 +179,17 @@ export function RegistrationForm({
 
     try {
       const supabase = createClient();
+
+      // Map displayKeys back to parent time slot IDs
+      // Get unique parent IDs from selected sub-slots
+      const unavailableParentSlots = Array.from(
+        new Set(
+          unavailableSlots.map((displayKey) => {
+            const subSlot = subSlots.find((s) => s.displayKey === displayKey);
+            return subSlot?.parentId;
+          }).filter(Boolean)
+        )
+      ) as string[];
 
       // Create invitation
       const { error } = await supabase.from('tournament_invitations').insert({
@@ -132,7 +200,7 @@ export function RegistrationForm({
         inviter_email: userEmail,
         invitee_email: partnerEmail,
         contact_phone: contactPhone || null,
-        unavailable_slot_ids: unavailableSlots.length > 0 ? unavailableSlots : null,
+        unavailable_slot_ids: unavailableParentSlots.length > 0 ? unavailableParentSlots : null,
         status: 'pending',
       });
 
@@ -303,35 +371,54 @@ export function RegistrationForm({
         <div className="space-y-4">
           <div>
             <h3 className="font-heading text-[20px] text-[#1b1b1b] mb-2">DISPONIBILIDAD</h3>
-            <p className="font-body text-[14px] text-gray-600 mb-4">
-              Marca los horarios donde <strong>NO</strong> puedes jugar
+            <p className="font-body text-[14px] text-gray-600 mb-2">
+              Marca los bloques de {matchDurationMinutes} minutos donde <strong>NO</strong> puedes jugar
+            </p>
+            <p className="font-body text-[12px] text-gray-500 mb-4">
+              💡 Ahora puedes seleccionar bloques específicos en lugar de horarios completos
             </p>
           </div>
 
-          {timeSlots.length > 0 ? (
-            <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {timeSlots.map((slot) => (
-                <label
-                  key={slot.id}
-                  className="flex items-center gap-3 p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={unavailableSlots.includes(slot.id)}
-                    onChange={() => handleToggleSlot(slot.id)}
-                    className="w-4 h-4"
-                  />
-                  <div className="flex-1">
-                    <p className="font-body text-[14px] text-[#1b1b1b]">
-                      {dayNames[slot.day_of_week]} {slot.start_time.substring(0, 5)} -{' '}
-                      {slot.end_time.substring(0, 5)}
-                    </p>
-                    {slot.courts && (
-                      <p className="font-body text-[12px] text-gray-600">{slot.courts.name}</p>
-                    )}
-                  </div>
-                </label>
-              ))}
+          {subSlots.length > 0 ? (
+            <div className="space-y-4 max-h-[400px] overflow-y-auto">
+              {/* Group by day */}
+              {Array.from(new Set(subSlots.map((s) => s.day_of_week)))
+                .sort()
+                .map((dayOfWeek) => {
+                  const daySlots = subSlots.filter((s) => s.day_of_week === dayOfWeek);
+                  return (
+                    <div key={dayOfWeek} className="border border-gray-200 rounded-lg p-3">
+                      <h4 className="font-heading text-[16px] text-[#1b1b1b] mb-3">
+                        {dayNames[dayOfWeek]}
+                      </h4>
+                      <div className="space-y-2">
+                        {daySlots.map((subSlot) => (
+                          <label
+                            key={subSlot.displayKey}
+                            className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={unavailableSlots.includes(subSlot.displayKey)}
+                              onChange={() => handleToggleSlot(subSlot.displayKey)}
+                              className="w-4 h-4"
+                            />
+                            <div className="flex-1">
+                              <p className="font-body text-[14px] text-[#1b1b1b]">
+                                {subSlot.start_time} - {subSlot.end_time}
+                              </p>
+                              {subSlot.court_name && (
+                                <p className="font-body text-[11px] text-gray-500">
+                                  {subSlot.court_name}
+                                </p>
+                              )}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           ) : (
             <p className="text-center text-gray-600 py-4">
@@ -392,7 +479,7 @@ export function RegistrationForm({
               <p className="font-body text-[14px] text-[#1b1b1b]">
                 {unavailableSlots.length === 0
                   ? 'Disponible en todos los horarios'
-                  : `${unavailableSlots.length} de ${timeSlots.length} horarios marcados`}
+                  : `${unavailableSlots.length} de ${subSlots.length} bloques marcados`}
               </p>
             </div>
           </div>
