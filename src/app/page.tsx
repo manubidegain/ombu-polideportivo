@@ -131,15 +131,27 @@ export default function Home() {
           {/* Cards */}
           <div className="flex flex-col gap-6 md:gap-8 lg:gap-11">
             {/* Pádel Cerradas */}
-            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-center min-h-[400px] md:h-[438px] p-6 sm:p-8 md:p-12 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-full md:w-[675px] h-[200px] md:h-full opacity-30 md:opacity-100">
+            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-stretch md:items-center md:h-[438px] relative overflow-hidden">
+              {/* Mobile: Imagen arriba */}
+              <div className="md:hidden w-full h-[180px] relative">
                 <img
                   src={imgPadel1}
                   alt="Canchas de Pádel"
-                  className="w-full h-full object-cover md:rounded-l-[39px]"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6">
+
+              {/* Desktop: Imagen derecha */}
+              <div className="hidden md:block absolute right-0 top-0 w-[675px] h-full">
+                <img
+                  src={imgPadel1}
+                  alt="Canchas de Pádel"
+                  className="w-full h-full object-cover rounded-l-[39px]"
+                />
+              </div>
+
+              {/* Contenido */}
+              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6 p-6 sm:p-8 md:p-12">
                 <div className="flex flex-col gap-3 md:gap-4">
                   <div>
                     <h3 className="font-heading text-[24px] sm:text-[28px] md:text-[32px] leading-[1] uppercase text-[#1b1b1b]">
@@ -164,15 +176,27 @@ export default function Home() {
             </div>
 
             {/* Pádel Abierta */}
-            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-center min-h-[400px] md:h-[438px] p-6 sm:p-8 md:p-12 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-full md:w-[675px] h-[200px] md:h-full opacity-30 md:opacity-100">
+            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-stretch md:items-center md:h-[438px] relative overflow-hidden">
+              {/* Mobile: Imagen arriba */}
+              <div className="md:hidden w-full h-[180px] relative">
                 <img
                   src={imgPadelAbierta}
                   alt="Cancha de Pádel Abierta"
-                  className="w-full h-full object-cover md:rounded-l-[39px]"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6">
+
+              {/* Desktop: Imagen derecha */}
+              <div className="hidden md:block absolute right-0 top-0 w-[675px] h-full">
+                <img
+                  src={imgPadelAbierta}
+                  alt="Cancha de Pádel Abierta"
+                  className="w-full h-full object-cover rounded-l-[39px]"
+                />
+              </div>
+
+              {/* Contenido */}
+              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6 p-6 sm:p-8 md:p-12">
                 <div className="flex flex-col gap-3 md:gap-4">
                   <div>
                     <h3 className="font-heading text-[24px] sm:text-[28px] md:text-[32px] leading-none uppercase text-[#1b1b1b]">
@@ -197,15 +221,27 @@ export default function Home() {
             </div>
 
             {/* Fútbol 7 */}
-            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-center min-h-[400px] md:h-[438px] p-6 sm:p-8 md:p-12 md:py-24 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-full md:w-[675px] h-[200px] md:h-full opacity-30 md:opacity-100">
+            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-stretch md:items-center md:h-[438px] relative overflow-hidden">
+              {/* Mobile: Imagen arriba */}
+              <div className="md:hidden w-full h-[180px] relative">
                 <img
                   src={imgFutbol7}
                   alt="Canchas de Fútbol 7"
-                  className="w-full h-full object-cover md:rounded-l-[39px]"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6">
+
+              {/* Desktop: Imagen derecha */}
+              <div className="hidden md:block absolute right-0 top-0 w-[675px] h-full">
+                <img
+                  src={imgFutbol7}
+                  alt="Canchas de Fútbol 7"
+                  className="w-full h-full object-cover rounded-l-[39px]"
+                />
+              </div>
+
+              {/* Contenido */}
+              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6 p-6 sm:p-8 md:p-12 md:py-24">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <h3 className="font-heading text-[28px] sm:text-[32px] md:text-[40px] leading-none uppercase text-[#1b1b1b]">
                     CANCHAS fútbol 7
@@ -226,15 +262,27 @@ export default function Home() {
             </div>
 
             {/* Fútbol 5 */}
-            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-center min-h-[400px] md:h-[438px] p-6 sm:p-8 md:p-12 md:py-24 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-full md:w-[675px] h-[200px] md:h-full opacity-30 md:opacity-100">
+            <div className="bg-[#dbf228] rounded-[20px] sm:rounded-[28px] md:rounded-[39px] flex flex-col md:flex-row items-stretch md:items-center md:h-[438px] relative overflow-hidden">
+              {/* Mobile: Imagen arriba */}
+              <div className="md:hidden w-full h-[180px] relative">
                 <img
                   src={imgFutbol5}
                   alt="Cancha de Fútbol 5"
-                  className="w-full h-full object-cover md:rounded-l-[39px]"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6">
+
+              {/* Desktop: Imagen derecha */}
+              <div className="hidden md:block absolute right-0 top-0 w-[675px] h-full">
+                <img
+                  src={imgFutbol5}
+                  alt="Cancha de Fútbol 5"
+                  className="w-full h-full object-cover rounded-l-[39px]"
+                />
+              </div>
+
+              {/* Contenido */}
+              <div className="relative z-10 w-full md:w-[403px] flex flex-col gap-4 md:gap-6 p-6 sm:p-8 md:p-12 md:py-24">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <h3 className="font-heading text-[28px] sm:text-[32px] md:text-[40px] leading-none uppercase text-[#1b1b1b]">
                     CANCHA fútbol 5
