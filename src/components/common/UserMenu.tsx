@@ -5,11 +5,13 @@ import { Smile, User, Calendar, LogOut, Settings, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { ButtonBallSpinner } from './LoadingSpinner';
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -49,12 +51,17 @@ export default function UserMenu() {
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setUser(null);
-    setIsOpen(false);
-    router.push('/');
-    router.refresh();
+    setLoggingOut(true);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      setUser(null);
+      setIsOpen(false);
+      router.push('/');
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const isAdmin = user?.user_metadata?.role === 'admin';
@@ -118,10 +125,11 @@ export default function UserMenu() {
 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors text-red-400"
+                  disabled={loggingOut}
+                  className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors text-red-400 disabled:opacity-50"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span className="font-body text-[14px]">Cerrar Sesión</span>
+                  {loggingOut ? <ButtonBallSpinner /> : <LogOut className="w-4 h-4" />}
+                  <span className="font-body text-[14px]">{loggingOut ? 'Cerrando...' : 'Cerrar Sesión'}</span>
                 </button>
               </div>
             </>

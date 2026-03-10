@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ButtonSpinner } from '@/components/common/LoadingSpinner';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 function SignupForm() {
   const router = useRouter();
@@ -189,7 +189,7 @@ function SignupForm() {
             disabled={loading}
             className="w-full bg-[#dbf228] text-[#1b1b1b] font-heading text-[18px] py-3 px-4 rounded-md hover:bg-[#c5db23] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading && <ButtonSpinner />}
+            {loading && <ButtonBallSpinner />}
             {loading ? 'CREANDO CUENTA...' : 'CREAR CUENTA'}
           </button>
 

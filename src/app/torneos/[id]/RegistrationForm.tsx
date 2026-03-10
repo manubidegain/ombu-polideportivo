@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 interface Category {
   id: string;
@@ -520,8 +521,9 @@ export function RegistrationForm({
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 bg-[#1b1b1b] text-white font-heading text-[16px] py-3 px-6 rounded-md hover:bg-[#2b2b2b] transition-colors disabled:opacity-50"
+              className="flex-1 bg-[#1b1b1b] text-white font-heading text-[16px] py-3 px-6 rounded-md hover:bg-[#2b2b2b] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
+              {loading && <ButtonBallSpinner />}
               {loading ? 'ENVIANDO...' : 'ENVIAR INVITACIÓN'}
             </button>
           </div>

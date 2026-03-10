@@ -50,7 +50,7 @@ export function LoadingSpinner({ size = 'md', text, fullScreen = false }: Loadin
   );
 }
 
-// Inline loader for buttons
+// Inline loader for buttons (generic spinner)
 export function ButtonSpinner() {
   return (
     <svg
@@ -73,5 +73,22 @@ export function ButtonSpinner() {
         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
       />
     </svg>
+  );
+}
+
+// Inline padel ball loader for buttons
+export function ButtonBallSpinner() {
+  return (
+    <span className="inline-flex items-center justify-center">
+      <span className="relative inline-block w-4 h-4 animate-bounce">
+        <span className="absolute inset-0 rounded-full bg-gradient-to-br from-[#dbf228] to-[#c5db23]">
+          {/* Ball texture lines */}
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="w-full h-[1px] bg-white/30 rotate-45" />
+            <span className="absolute w-full h-[1px] bg-white/30 -rotate-45" />
+          </span>
+        </span>
+      </span>
+    </span>
   );
 }

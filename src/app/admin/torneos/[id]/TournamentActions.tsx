@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import type { Tables } from '@/types/database.types';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 type TournamentStatus = 'draft' | 'registration_open' | 'in_progress' | 'completed' | 'cancelled';
 
@@ -122,8 +123,9 @@ export function TournamentActions({ tournament }: TournamentActionsProps) {
             key={action.status}
             onClick={() => handleStatusChange(action.status)}
             disabled={loading}
-            className={`${action.color} text-white font-body text-[14px] py-2 px-6 rounded transition-colors disabled:opacity-50`}
+            className={`${action.color} text-white font-body text-[14px] py-2 px-6 rounded transition-colors disabled:opacity-50 flex items-center gap-2`}
           >
+            {loading && <ButtonBallSpinner />}
             {action.label}
           </button>
         ))}

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 interface InvitationAcceptFormProps {
   invitationId: string;
@@ -193,15 +194,17 @@ export function InvitationAcceptForm({ invitationId, inviteeEmail }: InvitationA
         <button
           onClick={handleReject}
           disabled={loading}
-          className="w-full bg-white border-2 border-red-500 text-red-500 font-heading text-[16px] py-3 px-6 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
+          className="w-full bg-white border-2 border-red-500 text-red-500 font-heading text-[16px] py-3 px-6 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
+          {loading && <ButtonBallSpinner />}
           {loading ? 'PROCESANDO...' : 'RECHAZAR'}
         </button>
         <button
           onClick={handleAccept}
           disabled={loading}
-          className="w-full bg-[#1b1b1b] text-white font-heading text-[16px] py-3 px-6 rounded-md hover:bg-[#2b2b2b] transition-colors disabled:opacity-50"
+          className="w-full bg-[#1b1b1b] text-white font-heading text-[16px] py-3 px-6 rounded-md hover:bg-[#2b2b2b] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
+          {loading && <ButtonBallSpinner />}
           {loading ? 'PROCESANDO...' : 'ACEPTAR'}
         </button>
       </div>

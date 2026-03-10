@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { Tables } from '@/types/database.types';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 interface TournamentFormProps {
   courts: Tables<'courts'>[];
@@ -754,8 +755,9 @@ export function TournamentForm({ courts }: TournamentFormProps) {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-[#dbf228] text-[#1b1b1b] font-body text-[16px] py-3 px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50"
+              className="bg-[#dbf228] text-[#1b1b1b] font-body text-[16px] py-3 px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50 flex items-center gap-2"
             >
+              {loading && <ButtonBallSpinner />}
               {loading ? 'Creando...' : 'Crear Torneo'}
             </button>
           )}

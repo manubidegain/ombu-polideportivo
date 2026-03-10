@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 interface Category {
   id: string;
@@ -228,8 +229,9 @@ export function CategoryManager({ tournamentId, categories }: CategoryManagerPro
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#dbf228] text-[#1b1b1b] font-body text-[14px] py-2 px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50"
+                className="bg-[#dbf228] text-[#1b1b1b] font-body text-[14px] py-2 px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50 flex items-center gap-2"
               >
+                {loading && <ButtonBallSpinner />}
                 {loading ? 'Guardando...' : editingId ? 'Actualizar' : 'Agregar'}
               </button>
               <button
