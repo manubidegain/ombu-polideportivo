@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { Toaster } from 'sonner';
+import { Suspense } from 'react';
+import { OAuthHandler } from '@/components/auth/OAuthHandler';
 
 const kronaOne = Krona_One({
   weight: "400",
@@ -34,6 +36,9 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${kronaOne.variable} ${poppins.variable} antialiased`}>
         <Toaster position="top-right" richColors />
+        <Suspense fallback={null}>
+          <OAuthHandler />
+        </Suspense>
         <Navbar />
         <main>{children}</main>
         <Footer />

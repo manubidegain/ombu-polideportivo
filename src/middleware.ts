@@ -79,8 +79,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect logged-in users away from auth pages
-  if (request.nextUrl.pathname.startsWith('/auth') && user) {
+  // Redirect logged-in users away from auth pages (except callback routes)
+  if (
+    request.nextUrl.pathname.startsWith('/auth') &&
+    !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/auth/confirm') &&
+    user
+  ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
