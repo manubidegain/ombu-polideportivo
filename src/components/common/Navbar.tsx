@@ -2,15 +2,37 @@
 
 import { Instagram, MapPin, MessageCircle, Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import UserMenu from './UserMenu';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        mobileMenuOpen
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
 
   return (
     <>
-      <nav className="bg-[#1b1b1b] text-white sticky top-0 z-50 border-b border-white">
+      <nav className="bg-[#1b1b1b] text-white sticky top-0 z-50 border-b border-white" ref={mobileMenuRef}>
         <div className="w-full px-4 md:px-8 lg:px-[142px]">
           <div className="flex items-center justify-between h-[89px]">
             {/* Logo */}
