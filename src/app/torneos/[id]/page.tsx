@@ -149,34 +149,14 @@ export default async function TournamentPublicPage({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {categoriesWithCounts.map((category) => (
                   <div key={category.id} className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-heading text-[20px] text-[#1b1b1b] mb-1">
+                    <h3 className="font-heading text-[20px] text-[#1b1b1b] mb-2">
                       {category.name}
                     </h3>
                     {category.description && (
-                      <p className="font-body text-[14px] text-gray-600 mb-3">
+                      <p className="font-body text-[14px] text-gray-600">
                         {category.description}
                       </p>
                     )}
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Inscriptos:</span>
-                        <span
-                          className={`font-semibold ${
-                            category.registrations_count >= category.max_teams
-                              ? 'text-red-600'
-                              : category.registrations_count >= (category.min_teams ?? 0)
-                                ? 'text-green-600'
-                                : 'text-yellow-600'
-                          }`}
-                        >
-                          {category.registrations_count} / {category.max_teams}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Mínimo requerido:</span>
-                        <span className="font-semibold">{category.min_teams ?? 0}</span>
-                      </div>
-                    </div>
                   </div>
                 ))}
               </div>

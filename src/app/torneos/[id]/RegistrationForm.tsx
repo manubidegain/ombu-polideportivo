@@ -179,10 +179,7 @@ export function RegistrationForm({
     setLoading(true);
 
     try {
-      const supabase = createClient();
-
       // Map displayKeys back to parent time slot IDs
-      // Get unique parent IDs from selected sub-slots
       const unavailableParentSlots = Array.from(
         new Set(
           unavailableSlots.map((displayKey) => {
@@ -192,48 +189,34 @@ export function RegistrationForm({
         )
       ) as string[];
 
-      // Create invitation
-      const { data: invitationData, error } = await supabase
-        .from('tournament_invitations')
-        .insert({
-          tournament_id: tournamentId,
-          category_id: categoryId,
-          team_name: teamName,
-          inviter_id: user.id,
-          inviter_email: userEmail,
-          invitee_email: partnerEmail,
-          contact_phone: contactPhone || null,
-          unavailable_slot_ids: unavailableParentSlots.length > 0 ? unavailableParentSlots : null,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      // Call API to create registration (handles phantom account creation)
+      const response = await fetch('/api/tournament-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tournamentId,
+          categoryId,
+          teamName,
+          player1Id: user.id,
+          player1Email: userEmail,
+          player2Email: partnerEmail.toLowerCase(),
+          contactPhone: contactPhone || null,
+          unavailableSlotIds: unavailableParentSlots.length > 0 ? unavailableParentSlots : null,
+        }),
+      });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      // Send invitation email
-      try {
-        const emailResponse = await fetch('/api/send-tournament-invitation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ invitationId: invitationData.id }),
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al crear la inscripción');
+      }
+
+      toast.success(`¡Inscripción exitosa! Tu equipo "${teamName}" ha sido registrado.`);
+
+      if (result.isPhantomAccount) {
+        toast.info(`Se envió un email a ${partnerEmail} para que active su cuenta.`, {
+          duration: 5000,
         });
-
-        if (!emailResponse.ok) {
-          console.error('Failed to send email, but invitation was created');
-          toast.success(
-            `Invitación creada. Comparte este enlace con ${partnerEmail} para que acepte.`
-          );
-        } else {
-          toast.success(
-            `¡Invitación enviada! ${partnerEmail} recibirá un email para aceptar la inscripción.`
-          );
-        }
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
-        toast.success(
-          `Invitación creada. Comparte este enlace con ${partnerEmail} para que acepte.`
-        );
       }
 
       // Reset form
@@ -243,10 +226,10 @@ export function RegistrationForm({
       setUnavailableSlots([]);
       setCurrentStep('team');
 
-      // Refresh page to update counts
+      // Refresh page
       router.refresh();
     } catch (error) {
-      console.error('Error creating invitation:', error);
+      console.error('Error creating registration:', error);
       toast.error('Error al enviar la invitación. Por favor, intenta nuevamente.');
     } finally {
       setLoading(false);
@@ -255,20 +238,23 @@ export function RegistrationForm({
 
   // Not logged in
   if (!user) {
+    // Get current tournament URL for redirect after auth
+    const currentPath = `/torneos/${tournamentId}`;
+
     return (
       <div className="text-center py-8 space-y-4">
         <p className="font-body text-[14px] text-gray-700">
           Debes iniciar sesión para inscribirte al torneo
         </p>
         <Link
-          href="/auth/login"
+          href={`/auth/login?redirect=${encodeURIComponent(currentPath)}`}
           className="inline-block bg-[#1b1b1b] text-white font-body text-[14px] py-2 px-6 rounded hover:bg-[#2b2b2b] transition-colors"
         >
           INICIAR SESIÓN
         </Link>
         <p className="font-body text-[12px] text-gray-600">
           ¿No tienes cuenta?{' '}
-          <Link href="/auth/register" className="text-[#1b1b1b] underline">
+          <Link href={`/auth/signup?redirect=${encodeURIComponent(currentPath)}`} className="text-[#1b1b1b] underline">
             Regístrate aquí
           </Link>
         </p>

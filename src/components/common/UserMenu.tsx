@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Smile, User, Calendar, LogOut, Settings, LogIn } from 'lucide-react';
+import { Smile, User, Calendar, LogOut, Settings, LogIn, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -78,10 +78,14 @@ export default function UserMenu() {
     <div className="absolute right-[27px] top-[27px] w-10 h-10" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors"
+        className="w-10 h-10 flex items-center justify-center hover:bg-white/20 rounded-full transition-all hover:scale-110 cursor-pointer relative group"
         aria-label="User menu"
       >
-        <Smile className="w-7 h-7" strokeWidth={1.5} />
+        <Smile className={`w-7 h-7 transition-transform ${isOpen ? 'rotate-180' : ''}`} strokeWidth={1.5} />
+        {/* Subtle indicator dot when logged in */}
+        {user && (
+          <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#dbf228] rounded-full border-2 border-[#1b1b1b]" />
+        )}
       </button>
 
       {isOpen && (
@@ -110,6 +114,15 @@ export default function UserMenu() {
                 >
                   <User className="w-4 h-4" />
                   <span className="font-body text-[14px] text-white">Mi Perfil</span>
+                </Link>
+
+                <Link
+                  href="/perfil?tab=torneos"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors"
+                >
+                  <Trophy className="w-4 h-4" />
+                  <span className="font-body text-[14px] text-white">Mis Torneos</span>
                 </Link>
 
                 <Link
