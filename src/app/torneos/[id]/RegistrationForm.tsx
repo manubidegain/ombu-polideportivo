@@ -301,10 +301,7 @@ export function RegistrationForm({
                 const isFull = (category.registrations_count || 0) >= category.max_teams;
                 return (
                   <option key={category.id} value={category.id} disabled={isFull}>
-                    {category.name}{' '}
-                    {isFull
-                      ? '(LLENO)'
-                      : `(${category.registrations_count || 0}/${category.max_teams})`}
+                    {category.name}{isFull ? ' (LLENO)' : ''}
                   </option>
                 );
               })}

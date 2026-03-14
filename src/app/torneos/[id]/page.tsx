@@ -1,9 +1,9 @@
-import { createServerClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import Link from 'next/link';
 import { RegistrationForm } from './RegistrationForm';
+import { createServerClient } from '@/lib/supabase/server';
+import { es } from 'date-fns/locale';
+import { format } from 'date-fns';
+import { notFound } from 'next/navigation';
 
 export default async function TournamentPublicPage({
   params,
@@ -132,7 +132,7 @@ export default async function TournamentPublicPage({
               href={`/torneos/${id}/galeria`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-body text-[14px] transition-colors"
             >
-              📸 Ver Galería de Fotos
+              Ver Galería de Fotos
             </Link>
           </div>
         </div>

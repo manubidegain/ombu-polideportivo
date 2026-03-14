@@ -48,15 +48,6 @@ export default async function TorneosPage() {
     <div className="min-h-screen bg-[#ededed]">
       {/* Hero Section */}
       <div className="relative bg-[#1b1b1b] py-12 md:py-16 px-4">
-        {/* Background Image */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[#1b1b1b]" />
-          <img
-            src="https://www.figma.com/api/mcp/asset/50c7a059-7a3d-4d60-8dfd-46a6e3bcd450"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-50"
-          />
-        </div>
 
         <div className="max-w-[1344px] mx-auto relative z-10">
           <div className="flex flex-col gap-[100px] md:gap-[134px] items-center">
@@ -91,13 +82,14 @@ export default async function TorneosPage() {
                 PRÓXIMOS TORNEOS
               </p>
               <div className="flex h-[26px] w-[52px] items-center justify-center">
-                <div className="-scale-y-100 rotate-90">
-                  <img
-                    src="https://www.figma.com/api/mcp/asset/34bf7634-5f1f-4138-92c4-0a315313d84b"
-                    alt=""
-                    className="h-[52px] w-[26px]"
-                  />
-                </div>
+                <svg
+                  className="h-[26px] w-[52px] text-white transform -scale-y-100 rotate-90"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
           </div>
