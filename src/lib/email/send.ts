@@ -26,7 +26,7 @@ export async function sendBookingConfirmation(params: SendBookingConfirmationPar
     });
 
     const { data, error } = await resend.emails.send({
-      from: 'Polideportivo Ombú <onboarding@resend.dev>',
+      from: 'Polideportivo Ombú <info@ombustudio.com>',
       to: params.to,
       subject: `Reserva Confirmada - ${params.courtName}`,
       html: html,

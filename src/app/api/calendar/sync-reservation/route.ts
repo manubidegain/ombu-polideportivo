@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Reservation ID is required' }, { status: 400 });
     }
 
-    // Verify user is authenticated and is admin
+    // Verify user is authenticated
     const supabase = await createServerClient();
     const {
       data: { user },
@@ -23,11 +23,6 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin via user_metadata
-    if (user.user_metadata?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     // Get reservation with court info

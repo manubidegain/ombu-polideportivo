@@ -1,5 +1,5 @@
-import { createServerClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { createServerClient } from '@/lib/supabase/server';
 import { getMatchAssignmentHTML } from '@/lib/email/templates';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -158,7 +158,7 @@ async function sendMatchEmail(data: {
 }) {
   try {
     await resend.emails.send({
-      from: 'Polideportivo Ombú <onboarding@resend.dev>',
+      from: 'Polideportivo Ombú <info@ombustudio.com>',
       to: data.playerEmail,
       replyTo: 'polideportivocentrounion@gmail.com',
       subject: `Partido asignado - ${data.tournamentName}`,

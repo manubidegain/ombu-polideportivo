@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { Resend } from 'resend';
 import { createServerClient } from '@/lib/supabase/server';
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Send email using Resend
     const { data, error: emailError } = await resend.emails.send({
-      from: 'Polideportivo Ombú <onboarding@resend.dev>', // Change to your verified domain in production
+      from: 'Polideportivo Ombú <info@ombustudio.com>', // Change to your verified domain in production
       to: invitation.invitee_email,
       subject: `Invitación a torneo: ${invitation.tournaments?.name}`,
       html: `

@@ -1,5 +1,5 @@
-import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { createServerClient } from '@/lib/supabase/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -246,8 +246,8 @@ export async function POST(request: Request) {
     // In production, use your verified domain
     const fromEmail =
       process.env.NODE_ENV === 'production'
-        ? 'Polideportivo Ombú <invitaciones@ombupolideportivo.com>'
-        : 'Polideportivo Ombú <onboarding@resend.dev>';
+        ? 'Polideportivo Ombú <info@ombustudio.com>'
+        : 'Polideportivo Ombú <info@ombustudio.com>';
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,
