@@ -90,7 +90,11 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
       const parentId = reservation.recurrence_parent_id || id;
       const { error } = await supabase
         .from('reservations')
-        .update({ status: 'cancelled' })
+        .update({
+          status: 'cancelled',
+          is_recurring: false,
+          recurrence_parent_id: null
+        })
         .or(`id.eq.${parentId},recurrence_parent_id.eq.${parentId}`)
         .gte('reservation_date', reservation.reservation_date)
         .in('status', ['confirmed', 'pending']);
@@ -108,7 +112,11 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
       // Cancel only this reservation
       const { error } = await supabase
         .from('reservations')
-        .update({ status: 'cancelled' })
+        .update({
+          status: 'cancelled',
+          is_recurring: false,
+          recurrence_parent_id: null
+        })
         .eq('id', id);
 
       if (error) {

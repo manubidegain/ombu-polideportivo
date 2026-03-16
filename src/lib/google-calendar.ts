@@ -174,6 +174,31 @@ export async function listCalendars() {
   }
 }
 
+// Fetch events from Google Calendar
+export async function listCalendarEvents(
+  calendarId: string,
+  timeMin?: string,
+  timeMax?: string
+) {
+  const calendar = await getCalendarClient();
+
+  try {
+    const response = await calendar.events.list({
+      calendarId,
+      timeMin: timeMin || new Date().toISOString(),
+      timeMax,
+      singleEvents: true,
+      orderBy: 'startTime',
+      maxResults: 100,
+    });
+
+    return { success: true, events: response.data.items || [] };
+  } catch (error) {
+    console.error('Error listing calendar events:', error);
+    return { success: false, error, events: [] };
+  }
+}
+
 // Helper to format reservation data for calendar event
 export function formatReservationForCalendar(reservation: {
   reservation_date: string;

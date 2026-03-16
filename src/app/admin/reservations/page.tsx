@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { ReservationsList } from './ReservationsList';
+import { CalendarImport } from './CalendarImport';
 
 export default async function ReservationsPage() {
   const supabase = await createServerClient();
@@ -39,12 +40,15 @@ export default async function ReservationsPage() {
             Gestiona todas las reservas del polideportivo
           </p>
         </div>
-        <Link
-          href="/admin/reservations/new"
-          className="bg-[#dbf228] text-[#1b1b1b] font-heading text-[18px] py-3 px-6 rounded-md hover:bg-[#c5db23] transition-colors"
-        >
-          + NUEVA RESERVA
-        </Link>
+        <div className="flex gap-3">
+          <CalendarImport courts={courts} />
+          <Link
+            href="/admin/reservations/new"
+            className="bg-[#dbf228] text-[#1b1b1b] font-heading text-[18px] py-3 px-6 rounded-md hover:bg-[#c5db23] transition-colors"
+          >
+            + NUEVA RESERVA
+          </Link>
+        </div>
       </div>
 
       <ReservationsList initialReservations={reservations} courts={courts} />
