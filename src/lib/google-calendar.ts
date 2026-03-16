@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { createServerClient } from './supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 // Initialize Google Calendar API client with tenant-specific tokens
 export async function getCalendarClient() {
@@ -9,8 +9,11 @@ export async function getCalendarClient() {
     process.env.GOOGLE_REDIRECT_URI
   );
 
-  // Get active OAuth tokens from database
-  const supabase = await createServerClient();
+  // Get active OAuth tokens from database using service role client (bypasses RLS)
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
   const { data: token } = await supabase
     .from('google_oauth_tokens')
     .select('*')
@@ -104,9 +107,15 @@ export async function createCalendarEvent(params: CreateEventParams) {
     });
 
     return { success: true, eventId: response.data.id, data: response.data };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating calendar event:', error);
-    return { success: false, error };
+    const errorMessage = error?.message || error?.toString() || 'Unknown error';
+    const errorDetails = error?.response?.data || error?.errors || {};
+    return {
+      success: false,
+      error: errorMessage,
+      details: errorDetails
+    };
   }
 }
 
@@ -140,9 +149,15 @@ export async function updateCalendarEvent(params: UpdateEventParams) {
     });
 
     return { success: true, data: response.data };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating calendar event:', error);
-    return { success: false, error };
+    const errorMessage = error?.message || error?.toString() || 'Unknown error';
+    const errorDetails = error?.response?.data || error?.errors || {};
+    return {
+      success: false,
+      error: errorMessage,
+      details: errorDetails
+    };
   }
 }
 
@@ -156,9 +171,15 @@ export async function deleteCalendarEvent(calendarId: string, eventId: string) {
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting calendar event:', error);
-    return { success: false, error };
+    const errorMessage = error?.message || error?.toString() || 'Unknown error';
+    const errorDetails = error?.response?.data || error?.errors || {};
+    return {
+      success: false,
+      error: errorMessage,
+      details: errorDetails
+    };
   }
 }
 
