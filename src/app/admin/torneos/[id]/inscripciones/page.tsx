@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { AddTeamButton } from './AddTeamButton';
 
 export default async function TournamentRegistrationsPage({
   params,
@@ -20,10 +21,19 @@ export default async function TournamentRegistrationsPage({
 
   const supabase = await createServerClient();
 
-  // Fetch tournament
+  // Fetch tournament with categories
   const { data: tournament, error: tournamentError } = await supabase
     .from('tournaments')
-    .select('id, name, sport_type')
+    .select(`
+      id,
+      name,
+      sport_type,
+      tournament_categories (
+        id,
+        name,
+        max_teams
+      )
+    `)
     .eq('id', id)
     .single();
 
@@ -45,6 +55,19 @@ export default async function TournamentRegistrationsPage({
     )
     .eq('tournament_id', id)
     .order('registered_at', { ascending: false });
+
+  // Get registration counts per category
+  const categoriesWithCounts = await Promise.all(
+    (tournament.tournament_categories || []).map(async (category) => {
+      const { count } = await supabase
+        .from('tournament_registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('category_id', category.id)
+        .eq('status', 'confirmed');
+
+      return { ...category, registrations_count: count || 0 };
+    })
+  );
 
   // Fetch pending invitations (not yet accepted)
   const { data: pendingInvitations } = await supabase
@@ -97,50 +120,39 @@ export default async function TournamentRegistrationsPage({
           >
             ← Volver al torneo
           </Link>
-          <h1 className="font-heading text-[48px] text-white mb-2">INSCRIPCIONES</h1>
-          <p className="font-body text-[16px] text-gray-400">{tournament.name}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2">INSCRIPCIONES</h1>
+              <p className="font-body text-[14px] sm:text-[16px] text-gray-400">{tournament.name}</p>
+            </div>
+            <AddTeamButton tournamentId={id} categories={categoriesWithCounts} />
+          </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body text-[12px] text-gray-400 mb-1">Confirmadas</p>
-                <p className="font-heading text-[32px] text-green-400">{confirmed.length}</p>
-              </div>
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8">
+          <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+            <p className="font-body text-[10px] sm:text-[12px] text-gray-400 mb-1">Confirmadas</p>
+            <p className="font-heading text-[24px] sm:text-[32px] text-green-400">{confirmed.length}</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body text-[12px] text-gray-400 mb-1">Pendientes</p>
-                <p className="font-heading text-[32px] text-yellow-400">{pending.length}</p>
-              </div>
-            </div>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+            <p className="font-body text-[10px] sm:text-[12px] text-gray-400 mb-1">Pendientes</p>
+            <p className="font-heading text-[24px] sm:text-[32px] text-yellow-400">{pending.length}</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body text-[12px] text-gray-400 mb-1">Invitaciones Pendientes</p>
-                <p className="font-heading text-[32px] text-blue-400">{pendingInvitations?.length || 0}</p>
-              </div>
-            </div>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+            <p className="font-body text-[10px] sm:text-[12px] text-gray-400 mb-1">Invitaciones</p>
+            <p className="font-heading text-[24px] sm:text-[32px] text-blue-400">{pendingInvitations?.length || 0}</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-body text-[12px] text-gray-400 mb-1">Canceladas</p>
-                <p className="font-heading text-[32px] text-red-400">{cancelled.length}</p>
-              </div>
-            </div>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-6">
+            <p className="font-body text-[10px] sm:text-[12px] text-gray-400 mb-1">Canceladas</p>
+            <p className="font-heading text-[24px] sm:text-[32px] text-red-400">{cancelled.length}</p>
           </div>
         </div>
 
         {/* Pending Invitations */}
         {pendingInvitations && pendingInvitations.length > 0 && (
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
-            <h2 className="font-heading text-[24px] text-white mb-6">
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 sm:p-6 mb-8">
+            <h2 className="font-heading text-[18px] sm:text-[24px] text-white mb-4 sm:mb-6">
               INVITACIONES PENDIENTES ({pendingInvitations.length})
             </h2>
             <div className="overflow-x-auto">
@@ -191,8 +203,8 @@ export default async function TournamentRegistrationsPage({
         )}
 
         {/* Registrations List */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-          <h2 className="font-heading text-[24px] text-white mb-6">
+        <div className="bg-white/5 border border-white/10 rounded-lg p-4 sm:p-6">
+          <h2 className="font-heading text-[18px] sm:text-[24px] text-white mb-4 sm:mb-6">
             TODAS LAS INSCRIPCIONES ({registrations?.length || 0})
           </h2>
 

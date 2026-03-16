@@ -34,10 +34,10 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="font-heading text-[40px] text-white">DASHBOARD</h1>
-        <p className="font-body text-[16px] text-gray-400 mt-2">
+        <h1 className="font-heading text-[28px] sm:text-[40px] text-white">DASHBOARD</h1>
+        <p className="font-body text-[14px] sm:text-[16px] text-gray-400 mt-2">
           Bienvenido al panel de administración
         </p>
       </div>
@@ -58,8 +58,8 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="font-heading text-[24px] text-white mb-4">ACCIONES RÁPIDAS</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="font-heading text-[20px] sm:text-[24px] text-white mb-4">ACCIONES RÁPIDAS</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <Link
             href="/admin/courts"
             className="bg-[#dbf228] text-[#1b1b1b] font-heading text-[18px] py-4 px-6 rounded-md hover:bg-[#c5db23] transition-colors text-center"
@@ -101,7 +101,7 @@ export default async function AdminDashboard() {
 
       {/* Recent Reservations */}
       <div>
-        <h2 className="font-heading text-[24px] text-white mb-4">PRÓXIMAS RESERVAS</h2>
+        <h2 className="font-heading text-[20px] sm:text-[24px] text-white mb-4">PRÓXIMAS RESERVAS</h2>
         <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
           <RecentReservations />
         </div>
@@ -138,49 +138,86 @@ async function RecentReservations() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-white/5">
-          <tr>
-            <th className="px-6 py-3 text-left font-heading text-[14px] text-white">
-              FECHA
-            </th>
-            <th className="px-6 py-3 text-left font-heading text-[14px] text-white">
-              HORA
-            </th>
-            <th className="px-6 py-3 text-left font-heading text-[14px] text-white">
-              CANCHA
-            </th>
-            <th className="px-6 py-3 text-left font-heading text-[14px] text-white">
-              CLIENTE
-            </th>
-            <th className="px-6 py-3 text-left font-heading text-[14px] text-white">
-              PRECIO
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {reservations.map((reservation) => (
-            <tr key={reservation.id} className="border-t border-white/10">
-              <td className="px-6 py-4 font-body text-[14px] text-white">
-                {new Date(reservation.reservation_date).toLocaleDateString('es-UY')}
-              </td>
-              <td className="px-6 py-4 font-body text-[14px] text-white">
-                {reservation.start_time}
-              </td>
-              <td className="px-6 py-4 font-body text-[14px] text-white">
-                {reservation.courts?.name}
-              </td>
-              <td className="px-6 py-4 font-body text-[14px] text-white">
-                {reservation.customer_name}
-              </td>
-              <td className="px-6 py-4 font-body text-[14px] text-[#dbf228]">
-                ${reservation.price}
-              </td>
+    <>
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-white/5">
+            <tr>
+              <th className="px-4 lg:px-6 py-3 text-left font-heading text-[12px] lg:text-[14px] text-white">
+                FECHA
+              </th>
+              <th className="px-4 lg:px-6 py-3 text-left font-heading text-[12px] lg:text-[14px] text-white">
+                HORA
+              </th>
+              <th className="px-4 lg:px-6 py-3 text-left font-heading text-[12px] lg:text-[14px] text-white">
+                CANCHA
+              </th>
+              <th className="px-4 lg:px-6 py-3 text-left font-heading text-[12px] lg:text-[14px] text-white">
+                CLIENTE
+              </th>
+              <th className="px-4 lg:px-6 py-3 text-left font-heading text-[12px] lg:text-[14px] text-white">
+                PRECIO
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {reservations.map((reservation) => (
+              <tr key={reservation.id} className="border-t border-white/10">
+                <td className="px-4 lg:px-6 py-4 font-body text-[12px] lg:text-[14px] text-white">
+                  {new Date(reservation.reservation_date).toLocaleDateString('es-UY')}
+                </td>
+                <td className="px-4 lg:px-6 py-4 font-body text-[12px] lg:text-[14px] text-white">
+                  {reservation.start_time}
+                </td>
+                <td className="px-4 lg:px-6 py-4 font-body text-[12px] lg:text-[14px] text-white">
+                  {reservation.courts?.name}
+                </td>
+                <td className="px-4 lg:px-6 py-4 font-body text-[12px] lg:text-[14px] text-white">
+                  {reservation.customer_name}
+                </td>
+                <td className="px-4 lg:px-6 py-4 font-body text-[12px] lg:text-[14px] text-[#dbf228]">
+                  ${reservation.price}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden divide-y divide-white/10">
+        {reservations.map((reservation) => (
+          <div key={reservation.id} className="p-4 space-y-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-heading text-[12px] text-gray-400">FECHA</p>
+                <p className="font-body text-[14px] text-white">
+                  {new Date(reservation.reservation_date).toLocaleDateString('es-UY')}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-heading text-[12px] text-gray-400">PRECIO</p>
+                <p className="font-body text-[16px] text-[#dbf228]">${reservation.price}</p>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div>
+                <p className="font-heading text-[12px] text-gray-400">HORA</p>
+                <p className="font-body text-[14px] text-white">{reservation.start_time}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-heading text-[12px] text-gray-400">CANCHA</p>
+                <p className="font-body text-[14px] text-white">{reservation.courts?.name}</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-heading text-[12px] text-gray-400">CLIENTE</p>
+              <p className="font-body text-[14px] text-white">{reservation.customer_name}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

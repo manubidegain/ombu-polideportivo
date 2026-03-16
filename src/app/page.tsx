@@ -1,26 +1,26 @@
 import Link from "next/link";
 
-// Imágenes de Figma - Nosotros Section
-const imgNosotrosCancha = "https://www.figma.com/api/mcp/asset/749aa352-82fa-436b-b59b-55d0b8de709c";
-const imgNosotrosVista = "https://www.figma.com/api/mcp/asset/d43fc16a-69f0-4b90-a360-c1e31fdf1f7e";
+// Imágenes locales - Nosotros Section
+const imgNosotrosCancha = "/Diurno.webp"; // Vista diurna de las canchas
+const imgNosotrosVista = "/Nocturno.webp"; // Vista nocturna
 
-// Imágenes de Figma - Torneos Section
-const imgTorneos = "https://www.figma.com/api/mcp/asset/9cd028cb-6b34-4065-8b06-8c10f03f8209";
+// Imágenes locales - Torneos Section
+const imgTorneos = "/Ranking.webp"; // Imagen para sección de torneos
 
-// Imágenes de Figma - Canchas Section
-const imgPadel1 = "https://www.figma.com/api/mcp/asset/bbbe5bca-c2a3-426a-b2a6-b1324d4902a9";
-const imgPadelAbierta = "https://www.figma.com/api/mcp/asset/9a4e922f-d34e-4fcb-8264-e3c427ea036b";
-const imgFutbol7 = "https://www.figma.com/api/mcp/asset/89752f52-c73d-439b-975e-66336fe57e8d";
-const imgFutbol5 = "https://www.figma.com/api/mcp/asset/bbbe5bca-c2a3-426a-b2a6-b1324d4902a9";
+// Imágenes locales - Canchas Section
+const imgPadel1 = "/Ombu.webp"; // Vista general del Ombú
+const imgPadelAbierta = "/De arriba.webp"; // Vista aérea
+const imgFutbol7 = "/F7.webp"; // Cancha de fútbol 7
+const imgFutbol5 = "/F5.webp"; // Cancha de fútbol 5
 
-// Imágenes de Figma - Clases Section
-const imgClases = "https://www.figma.com/api/mcp/asset/dd8ebe2c-2186-4eff-a305-acfc393f557f";
+// Imágenes locales - Clases Section
+const imgClases = "/Paleta.webp"; // Imagen de paleta/clases
 
-// Imágenes de Figma - Sponsors Section
-const imgSponsorBanderas = "https://www.figma.com/api/mcp/asset/ba9f8c5b-3712-442f-aaca-e860f12a9a3d";
-const imgSponsorCamiseta = "https://www.figma.com/api/mcp/asset/cc427c11-3d82-4946-8885-0fcae39fc19e";
-const imgSponsorMarca = "https://www.figma.com/api/mcp/asset/d18d4e84-6f39-402f-a923-b1d2ff9bdebe";
-const imgSponsorRedes = "https://www.figma.com/api/mcp/asset/a2e16e68-5bc2-441d-845f-83891c1461d1";
+// Imágenes locales - Sponsors Section (usando imágenes existentes como placeholders)
+const imgSponsorBanderas = "/image-4.webp";
+const imgSponsorCamiseta = "/Atardecer.webp";
+const imgSponsorMarca = "/Ombu.webp";
+const imgSponsorRedes = "/Ranking.webp";
 
 export default function Home() {
   return (
