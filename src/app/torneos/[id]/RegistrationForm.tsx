@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 interface Category {
   id: string;
@@ -347,9 +348,6 @@ export function RegistrationForm({
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md font-body text-[14px] text-[#1b1b1b] focus:outline-none focus:ring-2 focus:ring-[#1b1b1b]"
             />
-            <p className="text-[12px] text-gray-600 mt-1">
-              Tu compañero recibirá un email para aceptar la invitación
-            </p>
           </div>
 
           {/* Phone */}

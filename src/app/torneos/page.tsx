@@ -1,7 +1,8 @@
-import { createServerClient } from '@/lib/supabase/server';
 import { format, getMonth } from 'date-fns';
-import { es } from 'date-fns/locale';
+
 import Link from 'next/link';
+import { createServerClient } from '@/lib/supabase/server';
+import { es } from 'date-fns/locale';
 
 export default async function TorneosPage() {
   const supabase = await createServerClient();
@@ -48,6 +49,15 @@ export default async function TorneosPage() {
     <div className="min-h-screen bg-[#ededed]">
       {/* Hero Section */}
       <div className="relative bg-[#1b1b1b] py-12 md:py-16 px-4">
+        {/* Background Image */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="/torneos3.webp"
+            alt="Torneos de pádel"
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-[#1b1b1b]/60"></div>
+        </div>
 
         <div className="max-w-[1344px] mx-auto relative z-10">
           <div className="flex flex-col gap-[100px] md:gap-[134px] items-center">
@@ -102,7 +112,7 @@ export default async function TorneosPage() {
           {/* Left Image */}
           <div className="flex-1 rounded-lg overflow-hidden">
             <img
-              src="https://www.figma.com/api/mcp/asset/d31e085b-c3d4-4aff-ba8b-f9010d5f0086"
+              src="/bebe.webp"
               alt="Torneo de pádel"
               className="w-full h-[400px] md:h-[712px] object-cover"
             />
@@ -113,7 +123,7 @@ export default async function TorneosPage() {
             {/* Top Image */}
             <div className="rounded-lg overflow-hidden">
               <img
-                src="https://www.figma.com/api/mcp/asset/b513da94-5a04-4337-99a1-46f92b62de31"
+                src="/todos.webp"
                 alt="Jugadores de pádel"
                 className="w-full h-[250px] md:h-[391px] object-cover"
               />

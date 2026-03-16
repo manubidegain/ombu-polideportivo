@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AddTeamButton } from './AddTeamButton';
+import { RegistrationActions } from './RegistrationActions';
 
 export default async function TournamentRegistrationsPage({
   params,
@@ -219,6 +220,7 @@ export default async function TournamentRegistrationsPage({
                     <th className="text-left font-body text-[12px] text-gray-400 pb-3">CONTACTO</th>
                     <th className="text-left font-body text-[12px] text-gray-400 pb-3">FECHA</th>
                     <th className="text-left font-body text-[12px] text-gray-400 pb-3">ESTADO</th>
+                    <th className="text-left font-body text-[12px] text-gray-400 pb-3">ACCIONES</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -261,6 +263,18 @@ export default async function TournamentRegistrationsPage({
                         </p>
                       </td>
                       <td className="py-4">{getStatusBadge(registration.status)}</td>
+                      <td className="py-4">
+                        {registration.category_id && registration.team_name ? (
+                          <RegistrationActions
+                            registrationId={registration.id}
+                            categoryId={registration.category_id}
+                            teamName={registration.team_name}
+                            categories={categoriesWithCounts}
+                          />
+                        ) : (
+                          <span className="font-body text-[12px] text-gray-500">N/A</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

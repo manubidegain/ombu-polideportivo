@@ -1,26 +1,26 @@
 import Link from "next/link";
 
 // Imágenes locales - Nosotros Section
-const imgNosotrosCancha = "/Diurno.webp"; // Vista diurna de las canchas
-const imgNosotrosVista = "/Nocturno.webp"; // Vista nocturna
+const imgNosotrosCancha = "/Ombu.webp"; // Vista diurna de las canchas
+const imgNosotrosVista = "/De arriba.webp"; // Vista nocturna
 
 // Imágenes locales - Torneos Section
-const imgTorneos = "/Ranking.webp"; // Imagen para sección de torneos
+const imgTorneos = "/torneos 2.webp"; // Imagen para sección de torneos
 
 // Imágenes locales - Canchas Section
-const imgPadel1 = "/Ombu.webp"; // Vista general del Ombú
-const imgPadelAbierta = "/De arriba.webp"; // Vista aérea
+const imgPadel1 = "/inicio.webp"; // Vista general del Ombú
+const imgPadelAbierta = "/image-4.webp"; // Vista aérea
 const imgFutbol7 = "/F7.webp"; // Cancha de fútbol 7
 const imgFutbol5 = "/F5.webp"; // Cancha de fútbol 5
 
 // Imágenes locales - Clases Section
-const imgClases = "/Paleta.webp"; // Imagen de paleta/clases
+const imgClases = "/clases.webp"; // Imagen de paleta/clases
 
 // Imágenes locales - Sponsors Section (usando imágenes existentes como placeholders)
-const imgSponsorBanderas = "/image-4.webp";
-const imgSponsorCamiseta = "/Atardecer.webp";
-const imgSponsorMarca = "/Ombu.webp";
-const imgSponsorRedes = "/Ranking.webp";
+const imgSponsorBanderas = "/Sponsor 1.webp";
+const imgSponsorCamiseta = "/Sponsor 2.webp";
+const imgSponsorMarca = "/Sponsor 3.webp";
+const imgSponsorRedes = "/Sponsor 4.webp";
 
 export default function Home() {
   return (
