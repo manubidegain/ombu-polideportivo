@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ACHIEVEMENT_DEFINITIONS } from '@/lib/tournaments/achievement-definitions';
+import { EditProfileForm } from './EditProfileForm';
 
 type ProfileData = {
   user: {
@@ -528,29 +529,25 @@ function ConfiguracionTab({ data }: { data: ProfileData }) {
         {/* Profile Settings */}
         <div className="bg-white/5 border border-white/10 rounded-lg p-6">
           <h3 className="font-heading text-[18px] text-white mb-4">INFORMACIÓN DEL PERFIL</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block font-body text-[12px] text-gray-400 mb-2">Nombre</label>
-              <input
-                type="text"
-                value={data.user.name}
-                disabled
-                className="w-full bg-white/5 border border-white/10 rounded px-4 py-2 text-white font-body text-[14px]"
-              />
-            </div>
-            <div>
-              <label className="block font-body text-[12px] text-gray-400 mb-2">
-                Correo Electrónico
-              </label>
-              <input
-                type="email"
-                value={data.user.email}
-                disabled
-                className="w-full bg-white/5 border border-white/10 rounded px-4 py-2 text-white font-body text-[14px]"
-              />
-            </div>
-            <p className="font-body text-[12px] text-gray-500">
-              Para actualizar tu información de perfil, por favor contacta al administrador.
+          <EditProfileForm
+            userId={data.user.id}
+            initialName={data.user.name}
+            initialAvatarUrl={data.user.avatar_url}
+          />
+
+          {/* Email (read-only) */}
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <label className="block font-body text-[12px] text-gray-400 mb-2">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              value={data.user.email}
+              disabled
+              className="w-full bg-white/5 border border-white/10 rounded px-4 py-2 text-gray-400 font-body text-[14px]"
+            />
+            <p className="font-body text-[10px] text-gray-500 mt-2">
+              El correo electrónico no se puede cambiar
             </p>
           </div>
         </div>
