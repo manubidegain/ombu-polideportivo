@@ -299,10 +299,16 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
           throw new Error('Debes especificar la fecha de fin para reservas recurrentes');
         }
 
-        // Generate all dates first to check for conflicts
-        const allDates = [];
+        // Validate that end date is after start date
         const startDate = new Date(formData.reservation_date);
         const endDate = new Date(formData.recurrence_end_date);
+
+        if (endDate <= startDate) {
+          throw new Error('La fecha de fin debe ser posterior a la fecha de inicio');
+        }
+
+        // Generate all dates first to check for conflicts
+        const allDates = [];
         const increment = formData.recurrence_frequency === 'weekly' ? 7 : 14;
 
         let currentDate = new Date(startDate);
@@ -736,7 +742,7 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
                   id="recurrence_end_date"
                   type="date"
                   required={formData.is_recurring}
-                  min={formData.reservation_date}
+                  min={formData.reservation_date ? new Date(new Date(formData.reservation_date).getTime() + 86400000).toISOString().split('T')[0] : ''}
                   value={formData.recurrence_end_date}
                   onChange={(e) =>
                     setFormData({ ...formData, recurrence_end_date: e.target.value })
