@@ -312,10 +312,13 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
         const increment = formData.recurrence_frequency === 'weekly' ? 7 : 14;
 
         let currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
+        // Use < instead of <= to exclude the exact end date (to satisfy check constraint)
+        while (currentDate < endDate) {
           allDates.push(currentDate.toISOString().split('T')[0]);
           currentDate.setDate(currentDate.getDate() + increment);
         }
+
+        console.log('Recurring reservation - all dates:', allDates);
 
         // Check for conflicts with existing reservations
         const { data: existingReservations, error: checkError } = await supabase
@@ -380,13 +383,20 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
           recurrence_end_date: formData.recurrence_end_date,
         }));
 
+        console.log('Child reservations to create:', childReservations.length);
+
         if (childReservations.length > 0) {
           const { data: createdChildren, error: childError } = await supabase
             .from('reservations')
             .insert(childReservations)
             .select();
 
-          if (childError) throw childError;
+          if (childError) {
+            console.error('Error creating child reservations:', childError);
+            throw childError;
+          }
+
+          console.log('Created child reservations:', createdChildren?.length);
 
           // Sync all child reservations with Google Calendar
           if (createdChildren) {
