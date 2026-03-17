@@ -92,6 +92,7 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
         .from('reservations')
         .update({
           status: 'cancelled',
+          cancelled_at: new Date().toISOString(),
           is_recurring: false,
           recurrence_parent_id: null
         })
@@ -114,6 +115,7 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
         .from('reservations')
         .update({
           status: 'cancelled',
+          cancelled_at: new Date().toISOString(),
           is_recurring: false,
           recurrence_parent_id: null
         })
