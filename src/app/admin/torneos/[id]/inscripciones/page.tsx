@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AddTeamButton } from './AddTeamButton';
 import { RegistrationActions } from './RegistrationActions';
+import { EditPlayerNames } from './EditPlayerNames';
 
 export default async function TournamentRegistrationsPage({
   params,
@@ -235,17 +236,16 @@ export default async function TournamentRegistrationsPage({
                         </p>
                       </td>
                       <td className="py-4">
-                        <div className="space-y-1">
-                          {registration.player_names && Array.isArray(registration.player_names) && registration.player_names.length > 0 ? (
-                            registration.player_names.map((player, idx) => (
-                              <p key={idx} className="font-body text-[12px] text-gray-400">
-                                {String(player)}
-                              </p>
-                            ))
-                          ) : (
-                            <p className="font-body text-[12px] text-gray-400">No especificado</p>
-                          )}
-                        </div>
+                        <EditPlayerNames
+                          registrationId={registration.id}
+                          currentPlayerNames={
+                            registration.player_names &&
+                            Array.isArray(registration.player_names) &&
+                            registration.player_names.length > 0
+                              ? registration.player_names.map((p) => String(p))
+                              : []
+                          }
+                        />
                       </td>
                       <td className="py-4">
                         <p className="font-body text-[12px] text-white">

@@ -85,45 +85,42 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
       }
     }
 
-    if (cancelAll) {
-      // Delete all future reservations in the series
-      const parentId = reservation.recurrence_parent_id || id;
-      const { error } = await supabase
-        .from('reservations')
-        .delete()
-        .or(`id.eq.${parentId},recurrence_parent_id.eq.${parentId}`)
-        .gte('reservation_date', reservation.reservation_date)
-        .in('status', ['confirmed', 'pending']);
+    // Use API endpoint to cancel (also deletes from Google Calendar)
+    try {
+      const response = await fetch('/api/admin/reservations/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reservationId: id,
+          cancelAll,
+        }),
+      });
 
-      if (error) {
-        console.error('Error deleting series:', error);
-        alert('Error al eliminar la serie de reservas.');
-        setCanceling(null);
-        return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al cancelar reserva');
       }
 
-      // Refresh the entire list
-      router.refresh();
-    } else {
-      // Delete only this reservation
-      const { error } = await supabase
-        .from('reservations')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting reservation:', error);
-        alert('Error al eliminar la reserva.');
-        setCanceling(null);
-        return;
+      // Show success message
+      if (data.calendarErrors) {
+        alert(
+          `Reserva(s) cancelada(s) exitosamente.\nNota: Algunos eventos no pudieron eliminarse del calendario (${data.calendarErrors}).`
+        );
       }
 
-      // Update local state
-      setReservations(reservations.filter((r) => r.id !== id));
+      // Refresh the list
+      if (cancelAll) {
+        router.refresh();
+      } else {
+        setReservations(reservations.filter((r) => r.id !== id));
+      }
+    } catch (error: any) {
+      console.error('Error canceling reservation:', error);
+      alert(error.message || 'Error al cancelar la reserva.');
     }
 
     setCanceling(null);
-    router.refresh();
   };
 
   const getStatusLabel = (status: string) => {

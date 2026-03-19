@@ -230,7 +230,9 @@ export function formatReservationForCalendar(reservation: {
   customer_email: string | null;
   notes: string | null;
 }) {
-  const startDateTime = new Date(`${reservation.reservation_date}T${reservation.start_time}`);
+  // IMPORTANT: Append timezone to ensure date is interpreted as Uruguay time (UTC-3)
+  // Without timezone, server interprets as UTC which causes 3-hour offset
+  const startDateTime = new Date(`${reservation.reservation_date}T${reservation.start_time}-03:00`);
   const endDateTime = new Date(startDateTime.getTime() + reservation.duration_minutes * 60000);
 
   const courtName = reservation.courts?.name || 'Cancha';
