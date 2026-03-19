@@ -111,7 +111,11 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Error adding unavailability:', error);
-      return NextResponse.json({ error: 'Error al agregar restricción' }, { status: 500 });
+      return NextResponse.json({
+        error: 'Error al agregar restricción',
+        details: error.message,
+        code: error.code
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

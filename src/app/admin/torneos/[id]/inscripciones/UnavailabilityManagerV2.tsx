@@ -86,7 +86,9 @@ export function UnavailabilityManagerV2({ registrationId, teamName, onClose }: P
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al agregar restricción');
+        console.error('Server error details:', data);
+        const errorMsg = data.details ? `${data.error}: ${data.details}` : data.error;
+        throw new Error(errorMsg || 'Error al agregar restricción');
       }
 
       toast.success('Restricción agregada');
