@@ -107,7 +107,11 @@ export function BlockedDatesList({ initialBlockedDates, courts }: BlockedDatesLi
             {blockedDates.map((blocked) => (
               <tr key={blocked.id} className="border-t border-white/10">
                 <td className="px-6 py-4 font-body text-[14px] text-white">
-                  {new Date(blocked.block_date).toLocaleDateString('es-UY')}
+                  {/* Parse date as YYYY-MM-DD to avoid timezone issues */}
+                  {(() => {
+                    const [year, month, day] = blocked.block_date.split('-');
+                    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString('es-UY');
+                  })()}
                 </td>
                 <td className="px-6 py-4 font-body text-[14px] text-white">
                   {blocked.courts?.name || 'Todas las canchas'}

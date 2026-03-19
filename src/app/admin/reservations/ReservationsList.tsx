@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Tables } from '@/types/database.types';
 import Link from 'next/link';
+import { List, Calendar as CalendarIcon, ArrowUpDown } from 'lucide-react';
+import { CalendarView } from './CalendarView';
 
 type Reservation = Tables<'reservations'> & {
   courts: { name: string } | null;
@@ -27,6 +29,8 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
   const [groupRecurring, setGroupRecurring] = useState<boolean>(true);
   const [expandedSeries, setExpandedSeries] = useState<Set<string>>(new Set());
   const [canceling, setCanceling] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const router = useRouter();
 
   const handleCancel = async (id: string) => {
@@ -230,7 +234,18 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
     return true;
   });
 
-  const groupedReservations = groupReservations(filteredReservations);
+  // Sort reservations by date and time
+  const sortedReservations = [...filteredReservations].sort((a, b) => {
+    const dateCompare = a.reservation_date.localeCompare(b.reservation_date);
+    if (dateCompare !== 0) {
+      return sortOrder === 'asc' ? dateCompare : -dateCompare;
+    }
+    // If same date, sort by start time
+    const timeCompare = a.start_time.localeCompare(b.start_time);
+    return sortOrder === 'asc' ? timeCompare : -timeCompare;
+  });
+
+  const groupedReservations = groupReservations(sortedReservations);
 
   if (reservations.length === 0) {
     return (
@@ -248,8 +263,65 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
     );
   }
 
+  // If calendar view is selected, render CalendarView component
+  if (viewMode === 'calendar') {
+    return (
+      <div className="space-y-4">
+        {/* View Mode Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('list')}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded font-body text-[14px] hover:bg-white/20 transition-colors"
+            >
+              <List className="w-4 h-4" />
+              Lista
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className="flex items-center gap-2 px-4 py-2 bg-[#dbf228] text-[#1b1b1b] rounded font-body text-[14px]"
+            >
+              <CalendarIcon className="w-4 h-4" />
+              Calendario
+            </button>
+          </div>
+        </div>
+
+        <CalendarView reservations={sortedReservations} courts={courts} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      {/* View Mode Toggle and Sort */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode('list')}
+            className="flex items-center gap-2 px-4 py-2 bg-[#dbf228] text-[#1b1b1b] rounded font-body text-[14px]"
+          >
+            <List className="w-4 h-4" />
+            Lista
+          </button>
+          <button
+            onClick={() => setViewMode('calendar')}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded font-body text-[14px] hover:bg-white/20 transition-colors"
+          >
+            <CalendarIcon className="w-4 h-4" />
+            Calendario
+          </button>
+        </div>
+
+        <button
+          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+          className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded font-body text-[14px] hover:bg-white/20 transition-colors"
+        >
+          <ArrowUpDown className="w-4 h-4" />
+          Ordenar: {sortOrder === 'asc' ? 'Más antiguo primero' : 'Más reciente primero'}
+        </button>
+      </div>
+
       {/* Search Bar */}
       <div className="bg-white/5 border border-white/10 rounded-lg p-4">
         <label className="block font-body text-[12px] text-gray-400 mb-2">
