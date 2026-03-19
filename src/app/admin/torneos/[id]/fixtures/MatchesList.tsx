@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, Clock, MapPin, Edit } from 'lucide-react';
+import { Calendar, Clock, MapPin, Edit, Settings } from 'lucide-react';
 import { MatchResultModal } from './MatchResultModal';
+import { EditMatchModal } from './EditMatchModal';
 
 type Match = {
   id: string;
@@ -25,6 +26,7 @@ type Match = {
   series: {
     name: string;
     phase: string;
+    category: string;
   } | null;
   score?: {
     sets: Array<{ team1: number; team2: number }>;
@@ -39,6 +41,7 @@ type Props = {
 
 export function MatchesList({ matches, onUpdate }: Props) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [editingMatch, setEditingMatch] = useState<Match | null>(null);
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -65,28 +68,43 @@ export function MatchesList({ matches, onUpdate }: Props) {
     );
   };
 
-  // Group matches by series
-  const matchesBySeries = matches.reduce(
+  // Group matches by category first, then by series
+  const matchesByCategory = matches.reduce(
     (acc, match) => {
+      const category = match.series?.category || 'Sin Categoría';
       const seriesName = match.series?.name || 'Sin Serie';
-      if (!acc[seriesName]) {
-        acc[seriesName] = [];
+
+      if (!acc[category]) {
+        acc[category] = {};
       }
-      acc[seriesName].push(match);
+      if (!acc[category][seriesName]) {
+        acc[category][seriesName] = [];
+      }
+      acc[category][seriesName].push(match);
       return acc;
     },
-    {} as Record<string, Match[]>
+    {} as Record<string, Record<string, Match[]>>
   );
 
   return (
-    <div className="space-y-6">
-      {Object.entries(matchesBySeries).map(([seriesName, seriesMatches]) => (
-        <div key={seriesName}>
-          <h3 className="font-heading text-[18px] text-white mb-3 pb-2 border-b border-white/10">
-            {seriesName}
-          </h3>
-          <div className="space-y-2">
-            {seriesMatches.map((match) => (
+    <div className="space-y-8">
+      {Object.entries(matchesByCategory).map(([categoryName, seriesGroups]) => (
+        <div key={categoryName} className="space-y-4">
+          {/* Category Header */}
+          <div className="bg-[#dbf228]/10 border border-[#dbf228]/30 rounded-lg p-4">
+            <h2 className="font-heading text-[22px] text-[#dbf228]">
+              {categoryName}
+            </h2>
+          </div>
+
+          {/* Series within category */}
+          {Object.entries(seriesGroups).map(([seriesName, seriesMatches]) => (
+            <div key={seriesName} className="ml-0 sm:ml-4">
+              <h3 className="font-heading text-[18px] text-white mb-3 pb-2 border-b border-white/10">
+                {seriesName}
+              </h3>
+              <div className="space-y-2">
+                {seriesMatches.map((match) => (
               <div
                 key={match.id}
                 className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-[#dbf228]/50 transition-colors"
@@ -141,6 +159,13 @@ export function MatchesList({ matches, onUpdate }: Props) {
                   <div className="flex items-center gap-2">
                     {getStatusBadge(match.status)}
                     <button
+                      onClick={() => setEditingMatch(match)}
+                      className="p-2 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 transition-colors"
+                      title="Editar horario/cancha"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={() => setSelectedMatch(match)}
                       className="p-2 rounded bg-white/10 hover:bg-white/20 text-gray-400 hover:text-white transition-colors"
                       title="Cargar resultado"
@@ -169,10 +194,24 @@ export function MatchesList({ matches, onUpdate }: Props) {
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ))}
+
+      {/* Edit Match Modal */}
+      {editingMatch && (
+        <EditMatchModal
+          match={editingMatch}
+          onClose={() => setEditingMatch(null)}
+          onSuccess={() => {
+            setEditingMatch(null);
+            if (onUpdate) onUpdate();
+          }}
+        />
+      )}
 
       {/* Match Result Modal */}
       {selectedMatch && (

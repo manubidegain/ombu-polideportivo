@@ -27,6 +27,7 @@ export async function GET(
         id,
         name,
         phase,
+        tournament_categories (name),
         tournament_series_teams (
           registration_id,
           tournament_registrations (
@@ -94,6 +95,7 @@ export async function GET(
       groupStandings.push({
         seriesId: series.id,
         groupName: series.name,
+        categoryName: series.tournament_categories?.name || 'Sin Categoría',
         phase: series.phase,
         standings: standings.map((s) => ({
           position: s.groupRank,

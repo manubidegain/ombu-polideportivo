@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 type Series = {
   id: string;
   name: string;
+  categoryName: string;
   team_count: number;
   currentTeamCount?: number;
 };
@@ -94,7 +95,7 @@ export function ChangeSeriesModal({
               Equipo: <span className="text-white font-semibold">{teamName}</span>
             </p>
             <p className="font-body text-[12px] text-yellow-400 mb-4">
-              ⚠️ Al cambiar de serie, se eliminarán los partidos del equipo en la serie actual y se regenerarán en la nueva serie.
+              ⚠️ Al cambiar de serie, se eliminarán los partidos del equipo en ambas series. Deberás usar el botón "GENERAR PARTIDOS" para regenerarlos.
             </p>
           </div>
 
@@ -115,7 +116,7 @@ export function ChangeSeriesModal({
 
                 return (
                   <option key={series.id} value={series.id}>
-                    {series.name}
+                    {series.categoryName} - {series.name}
                     {isCurrent ? ' (Actual)' : ''}
                     {` (${teamCount} equipos)`}
                   </option>
@@ -123,7 +124,7 @@ export function ChangeSeriesModal({
               })}
             </select>
             <p className="mt-2 font-body text-[12px] text-gray-400">
-              Los partidos se regenerarán automáticamente en ambas series
+              Después de cambiar, usá el botón "GENERAR PARTIDOS" para crear los partidos nuevamente
             </p>
           </div>
 

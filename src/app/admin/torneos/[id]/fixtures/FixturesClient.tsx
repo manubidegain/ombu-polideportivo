@@ -22,6 +22,7 @@ type Match = {
   series: {
     name: string;
     phase: string;
+    category: string;
   } | null;
   score?: {
     sets: Array<{ team1: number; team2: number }>;

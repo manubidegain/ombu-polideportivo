@@ -8,7 +8,7 @@ import { GroupStandings } from './GroupStandings';
 import { PlayoffGenerator } from './PlayoffGenerator';
 import { BracketView } from './BracketView';
 import { FixturesClient } from './FixturesClient';
-import { GenerateMatchesButton } from './GenerateMatchesButton';
+import { GenerateMatchesButtonSimple } from './GenerateMatchesButtonSimple';
 import { CreateMatchButton } from './CreateMatchButton';
 
 export default async function TournamentFixturesPage({
@@ -103,7 +103,11 @@ export default async function TournamentFixturesPage({
         team_name
       ),
       court:courts (name),
-      series:tournament_series (name, phase)
+      series:tournament_series (
+        name,
+        phase,
+        tournament_categories (name)
+      )
     `
     )
     .eq('tournament_id', id)
@@ -146,6 +150,7 @@ export default async function TournamentFixturesPage({
         ? {
             name: match.series.name as string,
             phase: match.series.phase as string,
+            category: match.series.tournament_categories?.name as string,
           }
         : null,
     }));
@@ -178,43 +183,45 @@ export default async function TournamentFixturesPage({
         {/* Group Standings */}
         {series && series.length > 0 && series.some(s => s.phase === 'groups') && (
           <div className="mb-8">
-            {/* Show generate matches button if series exist but no matches */}
-            {(() => {
-              const groupSeries = series.filter(s => s.phase === 'groups');
+            {/* Show generate matches button if series exist */}
+            <GenerateMatchesButtonSimple
+              tournamentId={id}
+              categories={(() => {
+                const groupSeries = series.filter(s => s.phase === 'groups');
+                const categoriesMap = new Map();
 
-              // Get unique categories from group series with their series IDs
-              const categoriesMap = new Map();
-              groupSeries.forEach(s => {
-                if (s.tournament_categories && s.category_id) {
-                  const catId = s.category_id;
-                  if (!categoriesMap.has(catId)) {
-                    categoriesMap.set(catId, {
-                      id: catId,
-                      name: s.tournament_categories.name,
-                      seriesIds: []
-                    });
+                groupSeries.forEach(s => {
+                  let categoryName = 'Sin Categoría';
+                  if (s.tournament_categories) {
+                    if (Array.isArray(s.tournament_categories) && s.tournament_categories.length > 0) {
+                      categoryName = s.tournament_categories[0].name;
+                    } else if (typeof s.tournament_categories === 'object' && 'name' in s.tournament_categories) {
+                      categoryName = (s.tournament_categories as any).name;
+                    }
                   }
-                  categoriesMap.get(catId).seriesIds.push(s.id);
-                }
-              });
 
-              return Array.from(categoriesMap.values()).map(category => {
-                // Check if any series in this category has matches using series_id from matchesRaw
-                const hasMatches = Boolean(matchesRaw && matchesRaw.some(m =>
-                  m.series_id && category.seriesIds.includes(m.series_id)
-                ));
+                  if (s.category_id) {
+                    const catId = s.category_id;
+                    if (!categoriesMap.has(catId)) {
+                      categoriesMap.set(catId, {
+                        id: catId,
+                        name: categoryName,
+                        seriesIds: []
+                      });
+                    }
+                    categoriesMap.get(catId).seriesIds.push(s.id);
+                  }
+                });
 
-                return (
-                  <GenerateMatchesButton
-                    key={category.id}
-                    tournamentId={id}
-                    categoryId={category.id}
-                    categoryName={category.name}
-                    hasMatches={hasMatches}
-                  />
-                );
-              });
-            })()}
+                return Array.from(categoriesMap.values()).map(category => ({
+                  id: category.id,
+                  name: category.name,
+                  hasMatches: Boolean(matchesRaw && matchesRaw.some(m =>
+                    m.series_id && category.seriesIds.includes(m.series_id)
+                  ))
+                }));
+              })()}
+            />
 
             <div className="mb-4">
               <h2 className="font-heading text-[24px] text-white mb-1">

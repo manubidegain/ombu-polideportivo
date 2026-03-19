@@ -94,110 +94,19 @@ export async function PATCH(request: Request) {
 
     if (insertError) throw insertError;
 
-    // 3. Regenerate matches for the new series
-    // Get all teams in the new series
-    const { data: seriesTeams } = await supabase
-      .from('tournament_series_teams')
-      .select(
-        `
-        registration_id,
-        tournament_registrations (
-          id,
-          team_name
-        )
-      `
-      )
-      .eq('series_id', newSeriesId);
-
-    if (!seriesTeams || seriesTeams.length < 2) {
-      return NextResponse.json({
-        success: true,
-        message: 'Equipo movido, pero no hay suficientes equipos para generar partidos',
-      });
-    }
-
-    // Delete existing matches for this series
-    const { error: deleteAllMatchesError } = await supabase
+    // 3. Delete matches involving this team in the new series
+    // This ensures no duplicate matches exist, but doesn't regenerate all matches
+    const { error: deleteNewSeriesMatchesError } = await supabase
       .from('tournament_matches')
       .delete()
-      .eq('series_id', newSeriesId);
+      .eq('series_id', newSeriesId)
+      .or(`team1_id.eq.${registrationId},team2_id.eq.${registrationId}`);
 
-    if (deleteAllMatchesError) throw deleteAllMatchesError;
-
-    // Generate new round-robin matches
-    const teams = seriesTeams
-      .map((st) => ({
-        id: st.tournament_registrations.id,
-        team_name: st.tournament_registrations.team_name,
-      }))
-      .filter((t) => t.team_name);
-
-    const matches = [];
-    for (let i = 0; i < teams.length; i++) {
-      for (let j = i + 1; j < teams.length; j++) {
-        matches.push({
-          tournament_id: newSeries.tournament_id,
-          series_id: newSeriesId,
-          team1_id: teams[i].id,
-          team2_id: teams[j].id,
-          status: 'scheduled',
-        });
-      }
-    }
-
-    if (matches.length > 0) {
-      const { error: insertMatchesError } = await supabase
-        .from('tournament_matches')
-        .insert(matches);
-
-      if (insertMatchesError) throw insertMatchesError;
-    }
-
-    // If there was an old series, regenerate its matches too
-    if (existingSeriesTeam) {
-      const { data: oldSeriesTeams } = await supabase
-        .from('tournament_series_teams')
-        .select(
-          `
-          registration_id,
-          tournament_registrations (
-            id,
-            team_name
-          )
-        `
-        )
-        .eq('series_id', existingSeriesTeam.series_id);
-
-      if (oldSeriesTeams && oldSeriesTeams.length >= 2) {
-        const oldTeams = oldSeriesTeams
-          .map((st) => ({
-            id: st.tournament_registrations.id,
-            team_name: st.tournament_registrations.team_name,
-          }))
-          .filter((t) => t.team_name);
-
-        const oldMatches = [];
-        for (let i = 0; i < oldTeams.length; i++) {
-          for (let j = i + 1; j < oldTeams.length; j++) {
-            oldMatches.push({
-              tournament_id: newSeries.tournament_id,
-              series_id: existingSeriesTeam.series_id,
-              team1_id: oldTeams[i].id,
-              team2_id: oldTeams[j].id,
-              status: 'scheduled',
-            });
-          }
-        }
-
-        if (oldMatches.length > 0) {
-          await supabase.from('tournament_matches').insert(oldMatches);
-        }
-      }
-    }
+    if (deleteNewSeriesMatchesError) throw deleteNewSeriesMatchesError;
 
     return NextResponse.json({
       success: true,
-      message: 'Serie cambiada exitosamente',
+      message: 'Equipo movido exitosamente. Usá el botón "GENERAR PARTIDOS" para crear los partidos de las series.',
     });
   } catch (error: any) {
     console.error('Error updating series:', error);
