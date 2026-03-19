@@ -1,6 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, Edit } from 'lucide-react';
+import { MatchResultModal } from './MatchResultModal';
 
 type Match = {
   id: string;
@@ -22,13 +26,20 @@ type Match = {
     name: string;
     phase: string;
   } | null;
+  score?: {
+    sets: Array<{ team1: number; team2: number }>;
+    supertiebreak?: { team1: number; team2: number };
+  };
 };
 
 type Props = {
   matches: Match[];
+  onUpdate?: () => void;
 };
 
-export function MatchesList({ matches }: Props) {
+export function MatchesList({ matches, onUpdate }: Props) {
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+
   const getStatusBadge = (status: string) => {
     const badges = {
       scheduled: 'bg-blue-500/20 text-blue-400',
@@ -126,14 +137,54 @@ export function MatchesList({ matches }: Props) {
                     </div>
                   </div>
 
-                  {/* Status */}
-                  <div>{getStatusBadge(match.status)}</div>
+                  {/* Status & Actions */}
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(match.status)}
+                    <button
+                      onClick={() => setSelectedMatch(match)}
+                      className="p-2 rounded bg-white/10 hover:bg-white/20 text-gray-400 hover:text-white transition-colors"
+                      title="Cargar resultado"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+
+                {/* Score Display (if completed) */}
+                {match.status === 'completed' && match.score && (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <div className="flex items-center gap-4 font-body text-[14px]">
+                      <span className="text-gray-400">Resultado:</span>
+                      {match.score.sets.map((set, idx) => (
+                        <span key={idx} className="text-white">
+                          {set.team1}-{set.team2}
+                        </span>
+                      ))}
+                      {match.score.supertiebreak && (
+                        <span className="text-[#dbf228]">
+                          ST: {match.score.supertiebreak.team1}-{match.score.supertiebreak.team2}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {/* Match Result Modal */}
+      {selectedMatch && (
+        <MatchResultModal
+          match={selectedMatch}
+          onClose={() => setSelectedMatch(null)}
+          onSuccess={() => {
+            setSelectedMatch(null);
+            if (onUpdate) onUpdate();
+          }}
+        />
+      )}
     </div>
   );
 }

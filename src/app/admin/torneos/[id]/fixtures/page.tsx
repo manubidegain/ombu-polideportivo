@@ -3,8 +3,9 @@ import { getCurrentUser } from '@/lib/auth/utils';
 import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { FixtureGenerator } from './FixtureGenerator';
-import { MatchesList } from './MatchesList';
+import { SmartFixtureGenerator } from './SmartFixtureGenerator';
+import { GroupStandings } from './GroupStandings';
+import { FixturesClient } from './FixturesClient';
 
 export default async function TournamentFixturesPage({
   params,
@@ -118,6 +119,12 @@ export default async function TournamentFixturesPage({
       scheduled_date: match.scheduled_date,
       scheduled_time: match.scheduled_time,
       status: match.status as string,
+      score: match.score as
+        | {
+            sets: Array<{ team1: number; team2: number }>;
+            supertiebreak?: { team1: number; team2: number };
+          }
+        | undefined,
       team1: {
         id: match.team1.id,
         team_name: match.team1.team_name as string,
@@ -156,30 +163,31 @@ export default async function TournamentFixturesPage({
           </p>
         </div>
 
-        {/* Fixture Generator */}
+        {/* Smart Fixture Generator */}
         <div className="mb-8">
-          <FixtureGenerator
+          <SmartFixtureGenerator
             tournamentId={id}
             categories={categoriesWithTeams}
-            existingSeries={series || []}
           />
         </div>
 
-        {/* Existing Matches */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-          <h2 className="font-heading text-[24px] text-white mb-6">
-            PARTIDOS GENERADOS ({matches?.length || 0})
-          </h2>
+        {/* Group Standings */}
+        {series && series.length > 0 && (
+          <div className="mb-8">
+            <div className="mb-4">
+              <h2 className="font-heading text-[24px] text-white mb-1">
+                POSICIONES
+              </h2>
+              <p className="font-body text-[14px] text-gray-400">
+                Tabla de posiciones de las series generadas
+              </p>
+            </div>
+            <GroupStandings tournamentId={id} />
+          </div>
+        )}
 
-          {matches && matches.length > 0 ? (
-            <MatchesList matches={matches} />
-          ) : (
-            <p className="text-center text-gray-400 py-8">
-              No se han generado partidos todavía. Usa el generador de fixture arriba para crear series
-              y partidos.
-            </p>
-          )}
-        </div>
+        {/* Existing Matches */}
+        <FixturesClient matches={matches} />
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ type TimeSlot = {
   id: string;
   day_of_week: number;
   start_time: string;
+  end_time: string;
   court_id: string;
 };
 
@@ -21,6 +22,11 @@ type Match = {
   scheduled_time: string | null;
   court_id: string | null;
   status: 'scheduled';
+};
+
+type TeamUnavailability = {
+  registration_id: string;
+  time_slot_id: string;
 };
 
 /**
@@ -54,13 +60,14 @@ export function generateRoundRobinMatches(
 }
 
 /**
- * Assign time slots to matches
- * Considers tournament start date and available time slots
+ * Assign time slots to matches (ENHANCED VERSION)
+ * Considers tournament start/end dates, available time slots, and team unavailability
  */
 export async function assignTimeSlots(
   matches: Match[],
   tournamentId: string,
-  startDate: string
+  startDate: string,
+  endDate?: string
 ): Promise<Match[]> {
   const supabase = await createServerClient();
 
@@ -74,37 +81,78 @@ export async function assignTimeSlots(
     .order('start_time');
 
   if (!timeSlots || timeSlots.length === 0) {
-    // No time slots available, return matches without schedules
     return matches;
   }
 
-  // Get starting date
+  // Fetch team unavailability
+  const teamIds = matches.flatMap((m) => [m.team1_id, m.team2_id]);
+  const { data: unavailability } = await supabase
+    .from('tournament_team_unavailability')
+    .select('registration_id, time_slot_id')
+    .in('registration_id', teamIds);
+
   const startDateObj = new Date(startDate);
+  const endDateObj = endDate ? new Date(endDate) : new Date(startDateObj.getTime() + 90 * 24 * 60 * 60 * 1000); // Default 90 days
+
+  // Track which slots are used on which dates
+  const usedSlots = new Map<string, Set<string>>();
+
+  // Track when each team last played
+  const teamLastMatch = new Map<string, { date: string; time: string }>();
+
   const matchesWithSchedule = [...matches];
 
-  // Simple algorithm: assign matches sequentially to available time slots
-  // Starting from tournament start date
-  let currentDate = new Date(startDateObj);
-  let slotIndex = 0;
-
   for (let i = 0; i < matchesWithSchedule.length; i++) {
-    const slot = timeSlots[slotIndex % timeSlots.length];
+    const match = matchesWithSchedule[i];
+    let assigned = false;
+    const currentDate = new Date(startDateObj);
 
-    // Find next date that matches the day_of_week
-    while (currentDate.getDay() !== slot.day_of_week) {
+    while (currentDate <= endDateObj && !assigned) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      const dayOfWeek = currentDate.getDay();
+
+      const daySlots = timeSlots.filter((slot) => slot.day_of_week === dayOfWeek);
+
+      for (const slot of daySlots) {
+        const slotKey = `${dateStr}-${slot.id}`;
+
+        if (!usedSlots.has(dateStr)) {
+          usedSlots.set(dateStr, new Set());
+        }
+
+        if (usedSlots.get(dateStr)!.has(slot.id)) continue;
+
+        // Check team unavailability
+        const team1Unavailable = unavailability?.some(
+          (u) => u.registration_id === match.team1_id && u.time_slot_id === slot.id
+        );
+        const team2Unavailable = unavailability?.some(
+          (u) => u.registration_id === match.team2_id && u.time_slot_id === slot.id
+        );
+
+        if (team1Unavailable || team2Unavailable) continue;
+
+        // Avoid back-to-back matches on same day
+        const team1Last = teamLastMatch.get(match.team1_id);
+        const team2Last = teamLastMatch.get(match.team2_id);
+
+        if (team1Last?.date === dateStr || team2Last?.date === dateStr) continue;
+
+        // Assign slot
+        match.scheduled_date = dateStr;
+        match.scheduled_time = slot.start_time;
+        match.court_id = slot.court_id;
+
+        usedSlots.get(dateStr)!.add(slot.id);
+        teamLastMatch.set(match.team1_id, { date: dateStr, time: slot.start_time });
+        teamLastMatch.set(match.team2_id, { date: dateStr, time: slot.start_time });
+
+        assigned = true;
+        break;
+      }
+
+      if (assigned) break;
       currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    matchesWithSchedule[i].scheduled_date = currentDate.toISOString().split('T')[0];
-    matchesWithSchedule[i].scheduled_time = slot.start_time;
-    matchesWithSchedule[i].court_id = slot.court_id;
-
-    slotIndex++;
-
-    // If we've used all slots for this day, move to next occurrence
-    if (slotIndex % timeSlots.filter(s => s.day_of_week === slot.day_of_week).length === 0) {
-      // Move to next week's occurrence of this day
-      currentDate.setDate(currentDate.getDate() + 7);
     }
   }
 
@@ -226,7 +274,7 @@ export async function generateFixtures(
   // Get tournament start date
   const { data: tournament } = await supabase
     .from('tournaments')
-    .select('start_date')
+    .select('start_date, end_date')
     .eq('id', tournamentId)
     .single();
 
@@ -245,7 +293,7 @@ export async function generateFixtures(
 
   // 4. Assign time slots if requested
   if (assignSchedule) {
-    matches = await assignTimeSlots(matches, tournamentId, tournament.start_date);
+    matches = await assignTimeSlots(matches, tournamentId, tournament.start_date, tournament.end_date || undefined);
   }
 
   // 5. Save matches to database
@@ -255,4 +303,65 @@ export async function generateFixtures(
     seriesId: series.id,
     matchCount: matches.length,
   };
+}
+
+/**
+ * Helper: Calculate total matches for a group
+ */
+export function calculateGroupMatches(teamCount: number): number {
+  return (teamCount * (teamCount - 1)) / 2;
+}
+
+/**
+ * Helper: Estimate tournament duration
+ */
+export function estimateTournamentDuration(
+  totalMatches: number,
+  slotsPerDay: number,
+  courtsAvailable: number
+): number {
+  const matchesPerDay = slotsPerDay * courtsAvailable;
+  return Math.ceil(totalMatches / matchesPerDay);
+}
+
+/**
+ * Validates if tournament can be completed within date range
+ */
+export async function validateSchedulingFeasibility(
+  matchCount: number,
+  tournamentId: string,
+  startDate: string,
+  endDate: string
+): Promise<{ feasible: boolean; reason?: string }> {
+  const supabase = await createServerClient();
+
+  const { data: timeSlots } = await supabase
+    .from('tournament_time_slots')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .eq('is_active', true);
+
+  if (!timeSlots || timeSlots.length === 0) {
+    return {
+      feasible: false,
+      reason: 'No hay horarios configurados para el torneo',
+    };
+  }
+
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(endDate);
+  const daysInRange = Math.ceil((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24));
+
+  const slotsPerWeek = timeSlots.length;
+  const weeks = daysInRange / 7;
+  const totalAvailableSlots = Math.floor(slotsPerWeek * weeks);
+
+  if (totalAvailableSlots < matchCount) {
+    return {
+      feasible: false,
+      reason: `No hay suficientes horarios. Se necesitan ${matchCount} partidos pero solo hay ~${totalAvailableSlots} espacios disponibles.`,
+    };
+  }
+
+  return { feasible: true };
 }
