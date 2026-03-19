@@ -99,7 +99,8 @@ export function SmartFixtureGenerator({ tournamentId, categories }: Props) {
             teamIds,
             teamsPerGroup: customParsed.length > 0 ? customParsed : undefined,
             distributionMethod: 'snake',
-            assignSchedule: true,
+            assignSchedule: false,
+            generateMatches: false, // Only create series, not matches
           }),
         }
       );
@@ -107,11 +108,11 @@ export function SmartFixtureGenerator({ tournamentId, categories }: Props) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al generar fixture');
+        throw new Error(data.error || 'Error al generar series');
       }
 
       toast.success(
-        `✓ Fixture generado: ${data.groupCount} grupos, ${data.totalMatches} partidos`
+        `✓ Series creadas: ${data.groupCount} grupos. Ahora podés ajustar los equipos y generar los partidos.`
       );
 
       // Reset
@@ -121,7 +122,7 @@ export function SmartFixtureGenerator({ tournamentId, categories }: Props) {
       router.refresh();
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error(error.message || 'Error al generar fixture');
+      toast.error(error.message || 'Error al generar series');
     } finally {
       setGenerating(false);
     }
@@ -131,9 +132,9 @@ export function SmartFixtureGenerator({ tournamentId, categories }: Props) {
     <div className="bg-white/5 border border-white/10 rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="font-heading text-[24px] text-white mb-1">GENERAR FIXTURE</h2>
+          <h2 className="font-heading text-[24px] text-white mb-1">PASO 1: GENERAR SERIES</h2>
           <p className="font-body text-[14px] text-gray-400">
-            Sistema inteligente de grupos + playoffs
+            Crea los grupos. Luego podrás ajustar equipos y generar partidos.
           </p>
         </div>
 
@@ -244,12 +245,12 @@ export function SmartFixtureGenerator({ tournamentId, categories }: Props) {
             {generating ? (
               <>
                 <ButtonBallSpinner />
-                <span>GENERANDO...</span>
+                <span>CREANDO SERIES...</span>
               </>
             ) : (
               <>
                 <Play className="w-5 h-5" />
-                <span>GENERAR GRUPOS Y PARTIDOS</span>
+                <span>CREAR SERIES</span>
               </>
             )}
           </button>

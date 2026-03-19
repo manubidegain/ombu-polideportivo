@@ -427,28 +427,28 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
       {/* Reservations Table */}
       <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[1000px]">
             <thead className="bg-white/5">
               <tr>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   FECHA
                 </th>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   CANCHA
                 </th>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   HORARIO
                 </th>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   USUARIO
                 </th>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   PRECIO
                 </th>
-                <th className="px-6 py-4 text-left font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   ESTADO
                 </th>
-                <th className="px-6 py-4 text-right font-heading text-[14px] text-white">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 text-right font-heading text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                   ACCIONES
                 </th>
               </tr>
@@ -461,71 +461,71 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
 
                 return (
                   <tr key={reservation.id} className="border-t border-white/10">
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-body text-[14px] text-white">
+                        <span className="font-body text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                           {new Date(reservation.reservation_date).toLocaleDateString('es-UY')}
                           {isSeries && seriesInfo && (
-                            <span className="text-gray-400 text-[12px] ml-1">
+                            <span className="text-gray-400 text-[10px] sm:text-[12px] ml-1">
                               - {new Date(seriesInfo.lastDate).toLocaleDateString('es-UY')}
                             </span>
                           )}
                         </span>
                         {isSeries && seriesInfo && (
-                          <span className="bg-[#dbf228]/20 text-[#dbf228] px-2 py-0.5 rounded text-[10px] font-body">
+                          <span className="bg-[#dbf228]/20 text-[#dbf228] px-2 py-0.5 rounded text-[10px] font-body whitespace-nowrap">
                             SERIE ({seriesInfo.futureCount > 0 ? `${seriesInfo.futureCount} futuras` : 'finalizada'})
                           </span>
                         )}
                         {!isSeries && reservation.is_recurring && (
-                          <span className="bg-[#dbf228]/20 text-[#dbf228] px-2 py-0.5 rounded text-[10px] font-body">
+                          <span className="bg-[#dbf228]/20 text-[#dbf228] px-2 py-0.5 rounded text-[10px] font-body whitespace-nowrap">
                             RECURRENTE
                           </span>
                         )}
                         {!reservation.user_id && (
-                          <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-body">
+                          <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-body whitespace-nowrap">
                             MANUAL
                           </span>
                         )}
                       </div>
                     </td>
-                  <td className="px-6 py-4 font-body text-[14px] text-white">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-body text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                     {reservation.courts?.name}
                   </td>
-                  <td className="px-6 py-4 font-body text-[14px] text-white">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-body text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                     {reservation.start_time} ({reservation.duration_minutes} min)
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="font-body text-[14px] text-white">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <div className="font-body text-[12px] sm:text-[14px] text-white">
                       {reservation.user_id
                         ? (reservation.user_profiles?.full_name || reservation.customer_name || 'Sin nombre')
                         : (reservation.customer_name || 'Sin nombre')}
                     </div>
-                    <div className="font-body text-[12px] text-gray-400">
+                    <div className="font-body text-[10px] sm:text-[12px] text-gray-400">
                       {reservation.user_id
                         ? (reservation.user_profiles?.email || reservation.customer_email)
                         : reservation.customer_email}
                     </div>
                     {((reservation.user_id && reservation.user_profiles?.phone) || (!reservation.user_id && reservation.customer_phone)) && (
-                      <div className="font-body text-[12px] text-gray-400">
+                      <div className="font-body text-[10px] sm:text-[12px] text-gray-400">
                         {reservation.user_id ? reservation.user_profiles?.phone : reservation.customer_phone}
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 font-body text-[14px] text-white">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 font-body text-[12px] sm:text-[14px] text-white whitespace-nowrap">
                     ${reservation.price}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">
                     <span
-                      className={`px-3 py-1 rounded-full font-body text-[12px] ${getStatusColor(reservation.status)}`}
+                      className={`px-2 sm:px-3 py-1 rounded-full font-body text-[10px] sm:text-[12px] whitespace-nowrap ${getStatusColor(reservation.status)}`}
                     >
                       {getStatusLabel(reservation.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                    <div className="flex items-center justify-end gap-1 sm:gap-2">
                       <Link
                         href={`/admin/reservations/${reservation.id}`}
-                        className="bg-white/10 text-white font-body text-[12px] py-2 px-4 rounded hover:bg-white/20 transition-colors"
+                        className="bg-white/10 text-white font-body text-[10px] sm:text-[12px] py-1.5 sm:py-2 px-2 sm:px-4 rounded hover:bg-white/20 transition-colors whitespace-nowrap"
                       >
                         Ver
                       </Link>
@@ -533,7 +533,7 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
                         <button
                           onClick={() => handleCancel(reservation.id)}
                           disabled={canceling === reservation.id}
-                          className="bg-red-500/20 text-red-400 font-body text-[12px] py-2 px-4 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                          className="bg-red-500/20 text-red-400 font-body text-[10px] sm:text-[12px] py-1.5 sm:py-2 px-2 sm:px-4 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50 whitespace-nowrap"
                         >
                           {canceling === reservation.id ? 'Cancelando...' : 'Cancelar'}
                         </button>

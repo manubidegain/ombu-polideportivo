@@ -32,6 +32,7 @@ export async function POST(
       teamsPerGroup, // Optional: admin override
       distributionMethod = 'snake',
       assignSchedule = true,
+      generateMatches = false, // NEW: Only generate matches if explicitly requested
     } = body;
 
     if (!categoryId || !teamIds || teamIds.length < 3) {
@@ -109,35 +110,44 @@ export async function POST(
       // 2. Assign teams to series
       await assignTeamsToSeries(series.id, group.teams);
 
-      // 3. Generate round-robin matches
-      const groupTeams = group.teams
-        .map((teamId) => ({
-          id: teamId,
-          team_name: teamMap.get(teamId) || '',
-        }))
-        .filter((t) => t.team_name);
+      let matchCount = 0;
+      let scheduledMatchCount = 0;
 
-      let matches = generateRoundRobinMatches(groupTeams, tournamentId, series.id);
+      // 3. Generate matches only if requested
+      if (generateMatches) {
+        // 3a. Generate round-robin matches
+        const groupTeams = group.teams
+          .map((teamId) => ({
+            id: teamId,
+            team_name: teamMap.get(teamId) || '',
+          }))
+          .filter((t) => t.team_name);
 
-      // 4. Assign time slots if requested
-      if (assignSchedule && tournament.start_date) {
-        matches = await assignTimeSlots(
-          matches,
-          tournamentId,
-          tournament.start_date,
-          tournament.end_date || undefined
-        );
+        let matches = generateRoundRobinMatches(groupTeams, tournamentId, series.id);
+
+        // 3b. Assign time slots if requested
+        if (assignSchedule && tournament.start_date) {
+          matches = await assignTimeSlots(
+            matches,
+            tournamentId,
+            tournament.start_date,
+            tournament.end_date || undefined
+          );
+        }
+
+        // 3c. Save matches
+        await saveMatches(matches);
+
+        matchCount = matches.length;
+        scheduledMatchCount = matches.filter((m) => m.scheduled_date).length;
       }
-
-      // 5. Save matches
-      await saveMatches(matches);
 
       createdGroups.push({
         seriesId: series.id,
         groupName: group.name,
         teamCount: group.teams.length,
-        matchCount: matches.length,
-        scheduledMatches: matches.filter((m) => m.scheduled_date).length,
+        matchCount,
+        scheduledMatches: scheduledMatchCount,
       });
     }
 

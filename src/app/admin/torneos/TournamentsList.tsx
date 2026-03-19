@@ -40,50 +40,50 @@ export function TournamentsList({ tournaments }: TournamentsListProps) {
           href={`/admin/torneos/${tournament.id}`}
           className="block bg-white/5 border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-colors"
         >
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
             <div className="flex-1">
-              <div className="flex items-center gap-4 mb-2">
-                <h2 className="font-heading text-[24px] text-white">{tournament.name}</h2>
+              <div className="flex items-center gap-2 sm:gap-4 mb-2 flex-wrap">
+                <h2 className="font-heading text-[20px] sm:text-[24px] text-white">{tournament.name}</h2>
                 <TournamentStatusBadge status={tournament.status} />
               </div>
               {tournament.description && (
-                <p className="font-body text-[14px] text-gray-400 mb-4">
+                <p className="font-body text-[13px] sm:text-[14px] text-gray-400 mb-4">
                   {tournament.description}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div>
-              <p className="font-body text-[12px] text-gray-400">Deporte</p>
-              <p className="font-body text-[16px] text-white capitalize">
+              <p className="font-body text-[11px] sm:text-[12px] text-gray-400">Deporte</p>
+              <p className="font-body text-[14px] sm:text-[16px] text-white capitalize">
                 {tournament.sport_type}
               </p>
             </div>
 
             <div>
-              <p className="font-body text-[12px] text-gray-400">Fecha Inicio</p>
-              <p className="font-body text-[16px] text-white">
+              <p className="font-body text-[11px] sm:text-[12px] text-gray-400">Fecha Inicio</p>
+              <p className="font-body text-[14px] sm:text-[16px] text-white">
                 {format(new Date(tournament.start_date), 'd MMM yyyy', { locale: es })}
               </p>
             </div>
 
             <div>
-              <p className="font-body text-[12px] text-gray-400">Inscriptos</p>
-              <p className="font-body text-[16px] text-white">
+              <p className="font-body text-[11px] sm:text-[12px] text-gray-400">Inscriptos</p>
+              <p className="font-body text-[14px] sm:text-[16px] text-white">
                 {tournament.registrations_count} equipos
               </p>
             </div>
 
             <div>
-              <p className="font-body text-[12px] text-gray-400">Precio</p>
-              <p className="font-body text-[16px] text-white">${tournament.registration_price}</p>
+              <p className="font-body text-[11px] sm:text-[12px] text-gray-400">Precio</p>
+              <p className="font-body text-[14px] sm:text-[16px] text-white">${tournament.registration_price}</p>
             </div>
           </div>
 
           <div className="mt-4 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-6 text-[12px] text-gray-400">
+            <div className="flex items-center gap-3 sm:gap-6 text-[11px] sm:text-[12px] text-gray-400 flex-wrap">
               <span>Sets: {tournament.sets_to_win}</span>
               <span>Games: {tournament.games_per_set}</span>
               <span>Tiebreak: {tournament.tiebreak_points} pts</span>

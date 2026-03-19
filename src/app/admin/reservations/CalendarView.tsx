@@ -102,28 +102,28 @@ export function CalendarView({ reservations, courts }: CalendarViewProps) {
   return (
     <div className="space-y-4">
       {/* Date Navigation */}
-      <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+      <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <button
             onClick={goToPreviousDay}
-            className="p-2 hover:bg-white/10 rounded transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-white/10 rounded transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </button>
 
-          <div className="flex flex-col items-center gap-2">
-            <h2 className="font-heading text-[20px] text-white">
+          <div className="flex flex-col items-center gap-1 sm:gap-2">
+            <h2 className="font-heading text-[16px] sm:text-[20px] text-white text-center">
               {formatDateHeader(selectedDate)}
             </h2>
             <input
               type="date"
               value={selectedDateString}
               onChange={(e) => setSelectedDate(new Date(e.target.value + 'T12:00:00'))}
-              className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white font-body text-[12px] focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+              className="px-2 sm:px-3 py-1 bg-white/10 border border-white/20 rounded text-white font-body text-[11px] sm:text-[12px] focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
             />
             <button
               onClick={goToToday}
-              className="px-3 py-1 bg-[#dbf228]/20 text-[#dbf228] rounded font-body text-[11px] hover:bg-[#dbf228]/30 transition-colors"
+              className="px-2 sm:px-3 py-1 bg-[#dbf228]/20 text-[#dbf228] rounded font-body text-[10px] sm:text-[11px] hover:bg-[#dbf228]/30 transition-colors"
             >
               Hoy
             </button>
@@ -131,30 +131,30 @@ export function CalendarView({ reservations, courts }: CalendarViewProps) {
 
           <button
             onClick={goToNextDay}
-            className="p-2 hover:bg-white/10 rounded transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-white/10 rounded transition-colors"
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </button>
         </div>
       </div>
 
       {/* Summary */}
-      <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-        <div className="flex items-center justify-between">
-          <p className="font-body text-[14px] text-gray-400">
+      <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3 sm:gap-0">
+          <p className="font-body text-[13px] sm:text-[14px] text-gray-400">
             Total de reservas: <span className="text-white font-semibold">{dayReservations.length}</span>
           </p>
-          <div className="flex gap-4 text-[12px]">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-green-500/80"></div>
+          <div className="flex gap-3 sm:gap-4 text-[11px] sm:text-[12px] flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-500/80"></div>
               <span className="font-body text-gray-400">Confirmada</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-yellow-500/80"></div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-yellow-500/80"></div>
               <span className="font-body text-gray-400">Pendiente</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-red-500/80"></div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-red-500/80"></div>
               <span className="font-body text-gray-400">Cancelada</span>
             </div>
           </div>

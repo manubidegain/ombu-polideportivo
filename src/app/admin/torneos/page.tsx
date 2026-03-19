@@ -48,16 +48,16 @@ export default async function TorneosAdminPage() {
   return (
     <div className="min-h-screen bg-[#1b1b1b]">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="font-heading text-[48px] text-white mb-4">TORNEOS</h1>
-            <p className="font-body text-[18px] text-gray-400">
+            <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2 sm:mb-4">TORNEOS</h1>
+            <p className="font-body text-[14px] sm:text-[18px] text-gray-400">
               Gestiona torneos de pádel y fútbol
             </p>
           </div>
           <Link
             href="/admin/torneos/nuevo"
-            className="bg-[#dbf228] text-[#1b1b1b] font-heading text-[18px] py-3 px-6 rounded hover:bg-[#c5db23] transition-colors"
+            className="bg-[#dbf228] text-[#1b1b1b] font-heading text-[14px] sm:text-[18px] py-2 sm:py-3 px-4 sm:px-6 rounded hover:bg-[#c5db23] transition-colors text-center whitespace-nowrap"
           >
             + NUEVO TORNEO
           </Link>

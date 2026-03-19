@@ -268,31 +268,31 @@ export function TournamentForm({ courts }: TournamentFormProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4 flex-1">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1">
           <div
-            className={`flex-1 h-2 rounded ${currentStep === 'basic' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
+            className={`flex-1 h-1.5 sm:h-2 rounded ${currentStep === 'basic' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
           />
           <div
-            className={`flex-1 h-2 rounded ${currentStep === 'categories' ? 'bg-[#dbf228]' : currentStep === 'schedule' || currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
+            className={`flex-1 h-1.5 sm:h-2 rounded ${currentStep === 'categories' ? 'bg-[#dbf228]' : currentStep === 'schedule' || currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
           />
           <div
-            className={`flex-1 h-2 rounded ${currentStep === 'schedule' ? 'bg-[#dbf228]' : currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
+            className={`flex-1 h-1.5 sm:h-2 rounded ${currentStep === 'schedule' ? 'bg-[#dbf228]' : currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`}
           />
-          <div className={`flex-1 h-2 rounded ${currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`} />
+          <div className={`flex-1 h-1.5 sm:h-2 rounded ${currentStep === 'review' ? 'bg-[#dbf228]' : 'bg-white/20'}`} />
         </div>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-lg p-8">
+      <div className="bg-white/5 border border-white/10 rounded-lg p-4 sm:p-6 lg:p-8">
         {/* STEP 1: Basic Info */}
         {currentStep === 'basic' && (
           <div className="space-y-6">
-            <h2 className="font-heading text-[32px] text-white mb-6">INFORMACIÓN BÁSICA</h2>
+            <h2 className="font-heading text-[24px] sm:text-[28px] lg:text-[32px] text-white mb-4 sm:mb-6">INFORMACIÓN BÁSICA</h2>
 
             <div>
-              <label className="block font-body text-[14px] text-gray-400 mb-2">
+              <label className="block font-body text-[13px] sm:text-[14px] text-gray-400 mb-2">
                 Nombre del Torneo *
               </label>
               <input
@@ -301,7 +301,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ej: Torneo de Pádel Verano 2024"
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
               />
             </div>
 
@@ -314,7 +314,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descripción del torneo..."
                 rows={3}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
               />
             </div>
 
@@ -324,7 +324,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                 <select
                   value={sportType}
                   onChange={(e) => setSportType(e.target.value as 'padel' | 'futbol')}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                 >
                   <option value="padel">Pádel</option>
                   <option value="futbol">Fútbol</option>
@@ -342,7 +342,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                   min="0"
                   step="0.01"
                   required
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                 />
               </div>
             </div>
@@ -362,7 +362,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     min="1"
                     max="5"
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
 
@@ -376,7 +376,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     onChange={(e) => setGamesPerSet(e.target.value)}
                     min="1"
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
 
@@ -390,7 +390,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     onChange={(e) => setTiebreakPoints(e.target.value)}
                     min="1"
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
 
@@ -405,7 +405,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     min="30"
                     step="15"
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
               </div>
@@ -424,7 +424,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
 
@@ -436,7 +436,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                     type="datetime-local"
                     value={registrationDeadline}
                     onChange={(e) => setRegistrationDeadline(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-md font-body text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-md font-body text-[14px] sm:text-[16px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                         onChange={(e) => handleCategoryChange(index, 'name', e.target.value)}
                         placeholder="Ej: Categoría A"
                         required
-                        className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                        className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                       />
                     </div>
 
@@ -501,7 +501,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                         value={category.description}
                         onChange={(e) => handleCategoryChange(index, 'description', e.target.value)}
                         placeholder="Ej: Nivel avanzado"
-                        className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                        className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                       />
                     </div>
 
@@ -517,7 +517,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                         }
                         min="2"
                         required
-                        className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                        className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                       />
                     </div>
 
@@ -533,7 +533,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                         }
                         min="2"
                         required
-                        className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                        className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                       />
                     </div>
                   </div>
@@ -596,7 +596,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                           onChange={(e) =>
                             handleTimeSlotChange(index, 'court_id', e.target.value)
                           }
-                          className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                          className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                         >
                           {courts.map((court) => (
                             <option key={court.id} value={court.id}>
@@ -615,7 +615,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                           onChange={(e) =>
                             handleTimeSlotChange(index, 'day_of_week', parseInt(e.target.value))
                           }
-                          className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                          className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                         >
                           <option value={0}>Domingo</option>
                           <option value={1}>Lunes</option>
@@ -637,7 +637,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                           onChange={(e) =>
                             handleTimeSlotChange(index, 'start_time', e.target.value)
                           }
-                          className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                          className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                         />
                       </div>
 
@@ -651,7 +651,7 @@ export function TournamentForm({ courts }: TournamentFormProps) {
                           onChange={(e) =>
                             handleTimeSlotChange(index, 'end_time', e.target.value)
                           }
-                          className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                          className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-md font-body text-[13px] sm:text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
                         />
                       </div>
                     </div>

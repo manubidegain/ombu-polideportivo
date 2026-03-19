@@ -8,6 +8,7 @@ import { GroupStandings } from './GroupStandings';
 import { PlayoffGenerator } from './PlayoffGenerator';
 import { BracketView } from './BracketView';
 import { FixturesClient } from './FixturesClient';
+import { GenerateMatchesButton } from './GenerateMatchesButton';
 
 export default async function TournamentFixturesPage({
   params,
@@ -176,6 +177,44 @@ export default async function TournamentFixturesPage({
         {/* Group Standings */}
         {series && series.length > 0 && series.some(s => s.phase === 'groups') && (
           <div className="mb-8">
+            {/* Show generate matches button if series exist but no matches */}
+            {(() => {
+              const groupSeries = series.filter(s => s.phase === 'groups');
+
+              // Get unique categories from group series with their series IDs
+              const categoriesMap = new Map();
+              groupSeries.forEach(s => {
+                if (s.tournament_categories && s.category_id) {
+                  const catId = s.category_id;
+                  if (!categoriesMap.has(catId)) {
+                    categoriesMap.set(catId, {
+                      id: catId,
+                      name: s.tournament_categories.name,
+                      seriesIds: []
+                    });
+                  }
+                  categoriesMap.get(catId).seriesIds.push(s.id);
+                }
+              });
+
+              return Array.from(categoriesMap.values()).map(category => {
+                // Check if any series in this category has matches using series_id from matchesRaw
+                const hasMatches = Boolean(matchesRaw && matchesRaw.some(m =>
+                  m.series_id && category.seriesIds.includes(m.series_id)
+                ));
+
+                return (
+                  <GenerateMatchesButton
+                    key={category.id}
+                    tournamentId={id}
+                    categoryId={category.id}
+                    categoryName={category.name}
+                    hasMatches={hasMatches}
+                  />
+                );
+              });
+            })()}
+
             <div className="mb-4">
               <h2 className="font-heading text-[24px] text-white mb-1">
                 POSICIONES

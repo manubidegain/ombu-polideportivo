@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
-import { Trophy, TrendingUp } from 'lucide-react';
+import { Trophy, TrendingUp, ArrowRightLeft } from 'lucide-react';
+import { ChangeSeriesModal } from './ChangeSeriesModal';
 
 type TeamStanding = {
   position: number;
@@ -37,6 +38,11 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
   const [groups, setGroups] = useState<GroupStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [changingTeam, setChangingTeam] = useState<{
+    teamId: string;
+    teamName: string;
+    currentSeriesId: string;
+  } | null>(null);
 
   useEffect(() => {
     loadStandings();
@@ -165,6 +171,9 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                   <th className="text-center font-body text-[12px] text-gray-400 px-3 py-3">
                     GAMES
                   </th>
+                  <th className="text-center font-body text-[12px] text-gray-400 px-3 py-3">
+                    ACCIONES
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -219,6 +228,21 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                         {team.gamesWon}-{team.gamesLost}
                       </span>
                     </td>
+                    <td className="text-center px-3 py-4">
+                      <button
+                        onClick={() =>
+                          setChangingTeam({
+                            teamId: team.teamId,
+                            teamName: team.teamName,
+                            currentSeriesId: group.seriesId,
+                          })
+                        }
+                        className="p-2 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
+                        title="Cambiar serie"
+                      >
+                        <ArrowRightLeft className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -234,6 +258,25 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
           </div>
         </div>
       ))}
+
+      {/* Change Series Modal */}
+      {changingTeam && (
+        <ChangeSeriesModal
+          registrationId={changingTeam.teamId}
+          teamName={changingTeam.teamName}
+          currentSeriesId={changingTeam.currentSeriesId}
+          availableSeries={groups.map((g) => ({
+            id: g.seriesId,
+            name: g.groupName,
+            team_count: g.standings.length,
+            currentTeamCount: g.standings.length,
+          }))}
+          onClose={() => {
+            setChangingTeam(null);
+            loadStandings(); // Reload standings after change
+          }}
+        />
+      )}
     </div>
   );
 }
