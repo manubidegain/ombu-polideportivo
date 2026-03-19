@@ -1005,24 +1005,33 @@ export type Database = {
       tournament_team_unavailability: {
         Row: {
           created_at: string | null
+          day_of_week: number
+          end_time: string
           id: string
           reason: string | null
           registration_id: string
-          time_slot_id: string
+          start_time: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          day_of_week: number
+          end_time: string
           id?: string
           reason?: string | null
           registration_id: string
-          time_slot_id: string
+          start_time: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          day_of_week?: number
+          end_time?: string
           id?: string
           reason?: string | null
           registration_id?: string
-          time_slot_id?: string
+          start_time?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1030,13 +1039,6 @@ export type Database = {
             columns: ["registration_id"]
             isOneToOne: false
             referencedRelation: "tournament_registrations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tournament_team_unavailability_time_slot_id_fkey"
-            columns: ["time_slot_id"]
-            isOneToOne: false
-            referencedRelation: "tournament_time_slots"
             referencedColumns: ["id"]
           },
         ]

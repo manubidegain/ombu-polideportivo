@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EditCategoryModal } from './EditCategoryModal';
-import { UnavailabilityManager } from './UnavailabilityManager';
+import { UnavailabilityManagerV2 } from './UnavailabilityManagerV2';
 import { Trash2, Edit2, Clock } from 'lucide-react';
 import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
@@ -88,10 +88,9 @@ export function RegistrationActions({ registrationId, categoryId, teamName, cate
 
       {/* Unavailability Modal */}
       {showUnavailabilityModal && (
-        <UnavailabilityManager
+        <UnavailabilityManagerV2
           registrationId={registrationId}
           teamName={teamName}
-          tournamentId={tournamentId}
           onClose={() => setShowUnavailabilityModal(false)}
         />
       )}

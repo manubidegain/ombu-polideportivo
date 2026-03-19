@@ -26,7 +26,9 @@ type Match = {
 
 type TeamUnavailability = {
   registration_id: string;
-  time_slot_id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
 };
 
 /**
@@ -88,7 +90,7 @@ export async function assignTimeSlots(
   const teamIds = matches.flatMap((m) => [m.team1_id, m.team2_id]);
   const { data: unavailability } = await supabase
     .from('tournament_team_unavailability')
-    .select('registration_id, time_slot_id')
+    .select('registration_id, day_of_week, start_time, end_time')
     .in('registration_id', teamIds);
 
   const startDateObj = new Date(startDate);
@@ -122,13 +124,18 @@ export async function assignTimeSlots(
 
         if (usedSlots.get(dateStr)!.has(slot.id)) continue;
 
-        // Check team unavailability
-        const team1Unavailable = unavailability?.some(
-          (u) => u.registration_id === match.team1_id && u.time_slot_id === slot.id
-        );
-        const team2Unavailable = unavailability?.some(
-          (u) => u.registration_id === match.team2_id && u.time_slot_id === slot.id
-        );
+        // Check team unavailability - check if slot time overlaps with any unavailable time range
+        const team1Unavailable = unavailability?.some((u) => {
+          if (u.registration_id !== match.team1_id || u.day_of_week !== dayOfWeek) return false;
+          // Check if slot time range overlaps with unavailable time range
+          // Overlap occurs if: slot.start < unavail.end AND slot.end > unavail.start
+          return !(slot.end_time <= u.start_time || slot.start_time >= u.end_time);
+        });
+        const team2Unavailable = unavailability?.some((u) => {
+          if (u.registration_id !== match.team2_id || u.day_of_week !== dayOfWeek) return false;
+          // Check if slot time range overlaps with unavailable time range
+          return !(slot.end_time <= u.start_time || slot.start_time >= u.end_time);
+        });
 
         if (team1Unavailable || team2Unavailable) continue;
 
