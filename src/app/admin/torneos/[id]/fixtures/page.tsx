@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SmartFixtureGenerator } from './SmartFixtureGenerator';
 import { GroupStandings } from './GroupStandings';
+import { PlayoffGenerator } from './PlayoffGenerator';
+import { BracketView } from './BracketView';
 import { FixturesClient } from './FixturesClient';
 
 export default async function TournamentFixturesPage({
@@ -172,7 +174,7 @@ export default async function TournamentFixturesPage({
         </div>
 
         {/* Group Standings */}
-        {series && series.length > 0 && (
+        {series && series.length > 0 && series.some(s => s.phase === 'groups') && (
           <div className="mb-8">
             <div className="mb-4">
               <h2 className="font-heading text-[24px] text-white mb-1">
@@ -183,6 +185,23 @@ export default async function TournamentFixturesPage({
               </p>
             </div>
             <GroupStandings tournamentId={id} />
+          </div>
+        )}
+
+        {/* Playoff Generator */}
+        {series && series.length > 0 && series.some(s => s.phase === 'groups') && (
+          <div className="mb-8">
+            <PlayoffGenerator
+              tournamentId={id}
+              categories={tournament.tournament_categories || []}
+            />
+          </div>
+        )}
+
+        {/* Bracket View */}
+        {series && series.length > 0 && series.some(s => s.phase === 'playoffs' || s.phase === 'finals') && (
+          <div className="mb-8">
+            <BracketView tournamentId={id} />
           </div>
         )}
 
