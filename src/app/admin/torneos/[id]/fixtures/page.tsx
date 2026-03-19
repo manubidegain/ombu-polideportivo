@@ -9,6 +9,7 @@ import { PlayoffGenerator } from './PlayoffGenerator';
 import { BracketView } from './BracketView';
 import { FixturesClient } from './FixturesClient';
 import { GenerateMatchesButton } from './GenerateMatchesButton';
+import { CreateMatchButton } from './CreateMatchButton';
 
 export default async function TournamentFixturesPage({
   params,
@@ -245,7 +246,22 @@ export default async function TournamentFixturesPage({
         )}
 
         {/* Existing Matches */}
-        <FixturesClient matches={matches} />
+        <div className="space-y-4">
+          {/* Create Match Button - Show only if series exist */}
+          {series && series.length > 0 && (
+            <CreateMatchButton
+              tournamentId={id}
+              availableSeries={(series || []).map(s => ({
+                id: s.id,
+                name: s.name,
+                phase: s.phase,
+                category_id: s.category_id,
+              }))}
+            />
+          )}
+
+          <FixturesClient matches={matches} />
+        </div>
       </div>
     </div>
   );
