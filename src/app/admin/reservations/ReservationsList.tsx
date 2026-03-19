@@ -86,23 +86,18 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
     }
 
     if (cancelAll) {
-      // Cancel all future reservations in the series
+      // Delete all future reservations in the series
       const parentId = reservation.recurrence_parent_id || id;
       const { error } = await supabase
         .from('reservations')
-        .update({
-          status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
-          is_recurring: false,
-          recurrence_parent_id: null
-        })
+        .delete()
         .or(`id.eq.${parentId},recurrence_parent_id.eq.${parentId}`)
         .gte('reservation_date', reservation.reservation_date)
         .in('status', ['confirmed', 'pending']);
 
       if (error) {
-        console.error('Error canceling series:', error);
-        alert('Error al cancelar la serie de reservas.');
+        console.error('Error deleting series:', error);
+        alert('Error al eliminar la serie de reservas.');
         setCanceling(null);
         return;
       }
@@ -110,28 +105,21 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
       // Refresh the entire list
       router.refresh();
     } else {
-      // Cancel only this reservation
+      // Delete only this reservation
       const { error } = await supabase
         .from('reservations')
-        .update({
-          status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
-          is_recurring: false,
-          recurrence_parent_id: null
-        })
+        .delete()
         .eq('id', id);
 
       if (error) {
-        console.error('Error canceling reservation:', error);
-        alert('Error al cancelar la reserva.');
+        console.error('Error deleting reservation:', error);
+        alert('Error al eliminar la reserva.');
         setCanceling(null);
         return;
       }
 
       // Update local state
-      setReservations(
-        reservations.map((r) => (r.id === id ? { ...r, status: 'cancelled' as const } : r))
-      );
+      setReservations(reservations.filter((r) => r.id !== id));
     }
 
     setCanceling(null);
