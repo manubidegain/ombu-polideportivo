@@ -270,6 +270,7 @@ export default async function TournamentRegistrationsPage({
                             categoryId={registration.category_id}
                             teamName={registration.team_name}
                             categories={categoriesWithCounts}
+                            tournamentId={id}
                           />
                         ) : (
                           <span className="font-body text-[12px] text-gray-500">N/A</span>

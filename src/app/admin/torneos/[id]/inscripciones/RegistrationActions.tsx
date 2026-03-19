@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EditCategoryModal } from './EditCategoryModal';
-import { Trash2, Edit2 } from 'lucide-react';
+import { UnavailabilityManager } from './UnavailabilityManager';
+import { Trash2, Edit2, Clock } from 'lucide-react';
 import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
 
 type Category = {
@@ -18,11 +19,13 @@ type Props = {
   categoryId: string;
   teamName: string;
   categories: Category[];
+  tournamentId: string;
 };
 
-export function RegistrationActions({ registrationId, categoryId, teamName, categories }: Props) {
+export function RegistrationActions({ registrationId, categoryId, teamName, categories, tournamentId }: Props) {
   const router = useRouter();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showUnavailabilityModal, setShowUnavailabilityModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -54,6 +57,15 @@ export function RegistrationActions({ registrationId, categoryId, teamName, cate
   return (
     <>
       <div className="flex items-center gap-2">
+        {/* Unavailability Button */}
+        <button
+          onClick={() => setShowUnavailabilityModal(true)}
+          className="p-2 rounded bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors"
+          title="Restricciones horarias"
+        >
+          <Clock className="w-4 h-4" />
+        </button>
+
         {/* Edit Category Button */}
         <button
           onClick={() => setShowEditModal(true)}
@@ -73,6 +85,16 @@ export function RegistrationActions({ registrationId, categoryId, teamName, cate
           {deleting ? <ButtonBallSpinner /> : <Trash2 className="w-4 h-4" />}
         </button>
       </div>
+
+      {/* Unavailability Modal */}
+      {showUnavailabilityModal && (
+        <UnavailabilityManager
+          registrationId={registrationId}
+          teamName={teamName}
+          tournamentId={tournamentId}
+          onClose={() => setShowUnavailabilityModal(false)}
+        />
+      )}
 
       {/* Edit Category Modal */}
       {showEditModal && (
