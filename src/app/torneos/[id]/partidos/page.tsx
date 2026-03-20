@@ -110,7 +110,7 @@ export default async function PublicFixturesPage({
       .from('tournament_registrations')
       .select('id')
       .eq('tournament_id', id)
-      .eq('user_id', user.id);
+      .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`);
     userRegistrationIds = (userRegs || []).map((r) => r.id);
   }
 

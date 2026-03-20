@@ -11,6 +11,9 @@ type Series = {
   name: string;
   phase: string;
   category_id: string;
+  tournament_categories?: {
+    name: string;
+  };
 };
 
 type Team = {
@@ -174,11 +177,22 @@ export function CreateMatchModal({ tournamentId, availableSeries, onClose }: Pro
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white font-body text-[14px] focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
             >
               <option value="">Seleccionar serie...</option>
-              {availableSeries.map((series) => (
-                <option key={series.id} value={series.id}>
-                  {series.name}
-                </option>
-              ))}
+              {availableSeries
+                .sort((a, b) => {
+                  // First sort by category name
+                  const catA = a.tournament_categories?.name || '';
+                  const catB = b.tournament_categories?.name || '';
+                  const catCompare = catA.localeCompare(catB, 'es', { numeric: true });
+                  if (catCompare !== 0) return catCompare;
+
+                  // Then sort by series name
+                  return a.name.localeCompare(b.name, 'es', { numeric: true });
+                })
+                .map((series) => (
+                  <option key={series.id} value={series.id}>
+                    {series.tournament_categories?.name || 'Sin categoría'} - {series.name}
+                  </option>
+                ))}
             </select>
           </div>
 

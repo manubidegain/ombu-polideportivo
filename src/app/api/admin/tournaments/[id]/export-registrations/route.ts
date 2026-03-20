@@ -82,18 +82,17 @@ export async function GET(
     // Generate CSV
     const csvRows: string[] = [];
 
-    // Headers
+    // Headers - One row per player
     csvRows.push(
       [
         'Categoría',
         'Nombre del Equipo',
-        'Jugador 1',
-        'Jugador 2',
+        'Nombre del Jugador',
         'Email de Contacto',
         'Teléfono',
         'Estado de Inscripción',
         'Fecha de Registro',
-        'Tipo',
+        'Pagó',
       ].join(',')
     );
 
@@ -108,60 +107,65 @@ export async function GET(
       return str;
     };
 
-    // Add confirmed registrations
+    // Add confirmed registrations - ONE ROW PER PLAYER
     sortedRegistrations.forEach((reg: any) => {
       const playerNames = Array.isArray(reg.player_names) ? reg.player_names : [];
-      const player1 = playerNames[0] || '';
-      const player2 = playerNames[1] || '';
+      const statusText = reg.status === 'confirmed'
+        ? 'Confirmado'
+        : reg.status === 'pending'
+        ? 'Pendiente'
+        : 'Cancelado';
+      const registrationDate = reg.registered_at
+        ? format(new Date(reg.registered_at), 'd MMM yyyy', { locale: es })
+        : '';
 
-      csvRows.push(
-        [
-          escapeCSV(reg.tournament_categories?.name || 'N/A'),
-          escapeCSV(reg.team_name),
-          escapeCSV(player1),
-          escapeCSV(player2),
-          escapeCSV(reg.contact_email),
-          escapeCSV(reg.contact_phone || ''),
-          escapeCSV(
-            reg.status === 'confirmed'
-              ? 'Confirmado'
-              : reg.status === 'pending'
-              ? 'Pendiente'
-              : 'Cancelado'
-          ),
-          escapeCSV(
-            reg.registered_at
-              ? format(new Date(reg.registered_at), 'd MMM yyyy', { locale: es })
-              : ''
-          ),
-          escapeCSV('Inscripción'),
-        ].join(',')
-      );
+      // Add row for each player
+      playerNames.forEach((playerName: string) => {
+        if (playerName) { // Only add if player name exists
+          csvRows.push(
+            [
+              escapeCSV(reg.tournament_categories?.name || 'N/A'),
+              escapeCSV(reg.team_name),
+              escapeCSV(playerName),
+              escapeCSV(reg.contact_email),
+              escapeCSV(reg.contact_phone || ''),
+              escapeCSV(statusText),
+              escapeCSV(registrationDate),
+              '', // Empty column for "Pagó" to be filled manually
+            ].join(',')
+          );
+        }
+      });
     });
 
-    // Add pending invitations
+    // Add pending invitations - ONE ROW PER PLAYER
     sortedInvitations.forEach((inv: any) => {
       const playerNames = Array.isArray(inv.player_names) ? inv.player_names : [];
-      const player1 = playerNames[0] || inv.inviter_email;
-      const player2 = playerNames[1] || inv.invitee_email;
+      const invitationDate = inv.created_at
+        ? format(new Date(inv.created_at), 'd MMM yyyy', { locale: es })
+        : '';
 
-      csvRows.push(
-        [
-          escapeCSV(inv.tournament_categories?.name || 'N/A'),
-          escapeCSV(inv.team_name),
-          escapeCSV(player1),
-          escapeCSV(player2),
-          escapeCSV(inv.inviter_email),
-          escapeCSV(''),
-          escapeCSV('Invitación Pendiente'),
-          escapeCSV(
-            inv.created_at
-              ? format(new Date(inv.created_at), 'd MMM yyyy', { locale: es })
-              : ''
-          ),
-          escapeCSV('Invitación'),
-        ].join(',')
-      );
+      // If no player names, use emails
+      const players = playerNames.length > 0
+        ? playerNames
+        : [inv.inviter_email, inv.invitee_email].filter(Boolean);
+
+      players.forEach((playerName: string) => {
+        if (playerName) {
+          csvRows.push(
+            [
+              escapeCSV(inv.tournament_categories?.name || 'N/A'),
+              escapeCSV(inv.team_name),
+              escapeCSV(playerName),
+              escapeCSV(inv.inviter_email),
+              escapeCSV(''),
+              escapeCSV('Invitación Pendiente'),
+              escapeCSV(invitationDate),
+              '', // Empty column for "Pagó"
+            ].join(',')
+          );
+        }
+      });
     });
 
     const csv = csvRows.join('\n');
