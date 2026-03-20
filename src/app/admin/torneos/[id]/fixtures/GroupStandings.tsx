@@ -273,13 +273,25 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                               </span>
                             </td>
                             <td className="text-center px-3 py-4">
-                              <span className="font-body text-[12px] text-gray-300">
-                                {team.setsWon}-{team.setsLost}
+                              <span className={`font-body text-[13px] font-medium ${
+                                team.setsWon - team.setsLost > 0
+                                  ? 'text-green-400'
+                                  : team.setsWon - team.setsLost < 0
+                                  ? 'text-red-400'
+                                  : 'text-gray-400'
+                              }`}>
+                                {team.setsWon - team.setsLost > 0 ? '+' : ''}{team.setsWon - team.setsLost}
                               </span>
                             </td>
                             <td className="text-center px-3 py-4">
-                              <span className="font-body text-[12px] text-gray-300">
-                                {team.gamesWon}-{team.gamesLost}
+                              <span className={`font-body text-[13px] font-medium ${
+                                team.gamesWon - team.gamesLost > 0
+                                  ? 'text-green-400'
+                                  : team.gamesWon - team.gamesLost < 0
+                                  ? 'text-red-400'
+                                  : 'text-gray-400'
+                              }`}>
+                                {team.gamesWon - team.gamesLost > 0 ? '+' : ''}{team.gamesWon - team.gamesLost}
                               </span>
                             </td>
                             <td className="text-center px-3 py-4">
