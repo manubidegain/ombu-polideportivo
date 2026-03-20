@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ButtonBallSpinner } from '@/components/common/LoadingSpinner';
-import { Trophy, TrendingUp, ArrowRightLeft, ChevronDown, ChevronRight } from 'lucide-react';
-import { ChangeSeriesModal } from './ChangeSeriesModal';
+import { Trophy, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react';
 
 type TeamStanding = {
   position: number;
@@ -32,19 +31,15 @@ type GroupStanding = {
 
 type Props = {
   tournamentId: string;
-  categoryId?: string;
 };
 
-export function GroupStandings({ tournamentId, categoryId }: Props) {
+export function PublicStandings({ tournamentId }: Props) {
   const [groups, setGroups] = useState<GroupStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
-  const [changingTeam, setChangingTeam] = useState<{
-    teamId: string;
-    teamName: string;
-    currentSeriesId: string;
-  } | null>(null);
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleCategory = (categoryName: string) => {
     const newCollapsed = new Set(collapsedCategories);
@@ -58,22 +53,20 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
 
   useEffect(() => {
     loadStandings();
-  }, [tournamentId, categoryId]);
+  }, [tournamentId]);
 
   async function loadStandings() {
     setLoading(true);
     setError(null);
 
     try {
-      const url = categoryId
-        ? `/api/admin/tournaments/${tournamentId}/standings?categoryId=${categoryId}`
-        : `/api/admin/tournaments/${tournamentId}/standings`;
-
-      const response = await fetch(url);
+      const response = await fetch(
+        `/api/tournaments/${tournamentId}/public-standings`
+      );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al cargar standings');
+        throw new Error(data.error || 'Error al cargar posiciones');
       }
 
       setGroups(data.groups || []);
@@ -107,7 +100,7 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center">
         <p className="font-body text-[14px] text-gray-400">
-          No hay grupos generados todavía
+          No hay posiciones disponibles todavía
         </p>
       </div>
     );
@@ -131,7 +124,7 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
   return (
     <div className="space-y-6">
       {sortedCategories.map(([categoryName, categoryGroups]) => (
-        <div key={categoryName} className="space-y-4">
+        <div key={categoryName} className="space-y-4 animate-fadeIn">
           {/* Category Header */}
           <button
             onClick={() => toggleCategory(categoryName)}
@@ -143,7 +136,8 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
               </h2>
               <div className="flex items-center gap-3">
                 <span className="font-body text-[14px] text-gray-400">
-                  {categoryGroups.length} {categoryGroups.length === 1 ? 'serie' : 'series'}
+                  {categoryGroups.length}{' '}
+                  {categoryGroups.length === 1 ? 'serie' : 'series'}
                 </span>
                 {collapsedCategories.has(categoryName) ? (
                   <ChevronRight className="w-5 h-5 text-[#dbf228]" />
@@ -164,13 +158,14 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                 >
                   {/* Group Header */}
                   <div className="bg-white/5 px-6 py-4 border-b border-white/10">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-3">
                       <div>
                         <h3 className="font-heading text-[20px] text-white mb-1">
                           {group.groupName}
                         </h3>
                         <p className="font-body text-[12px] text-gray-400">
-                          {group.completedMatches} / {group.totalMatches} partidos completados
+                          {group.completedMatches} / {group.totalMatches} partidos
+                          completados
                         </p>
                       </div>
 
@@ -180,7 +175,9 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                           <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-[#dbf228] transition-all"
-                              style={{ width: `${group.completionPercentage}%` }}
+                              style={{
+                                width: `${group.completionPercentage}%`,
+                              }}
                             />
                           </div>
                           <span className="font-body text-[12px] text-gray-400">
@@ -224,9 +221,6 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                           </th>
                           <th className="text-center font-body text-[12px] text-gray-400 px-3 py-3">
                             GAMES
-                          </th>
-                          <th className="text-center font-body text-[12px] text-gray-400 px-3 py-3">
-                            ACCIONES
                           </th>
                         </tr>
                       </thead>
@@ -282,21 +276,6 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                                 {team.gamesWon}-{team.gamesLost}
                               </span>
                             </td>
-                            <td className="text-center px-3 py-4">
-                              <button
-                                onClick={() =>
-                                  setChangingTeam({
-                                    teamId: team.teamId,
-                                    teamName: team.teamName,
-                                    currentSeriesId: group.seriesId,
-                                  })
-                                }
-                                className="p-2 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
-                                title="Cambiar serie"
-                              >
-                                <ArrowRightLeft className="w-4 h-4" />
-                              </button>
-                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -306,8 +285,8 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
                   {/* Legend */}
                   <div className="px-6 py-3 bg-white/5 border-t border-white/10">
                     <p className="font-body text-[11px] text-gray-500">
-                      PJ: Partidos Jugados | PG: Partidos Ganados | PP: Partidos Perdidos |
-                      Ranking: Sets → Games → Head-to-Head
+                      PJ: Partidos Jugados | PG: Partidos Ganados | PP: Partidos
+                      Perdidos | Ranking: Partidos Ganados → Sets → Games
                     </p>
                   </div>
                 </div>
@@ -316,26 +295,6 @@ export function GroupStandings({ tournamentId, categoryId }: Props) {
           )}
         </div>
       ))}
-
-      {/* Change Series Modal */}
-      {changingTeam && (
-        <ChangeSeriesModal
-          registrationId={changingTeam.teamId}
-          teamName={changingTeam.teamName}
-          currentSeriesId={changingTeam.currentSeriesId}
-          availableSeries={groups.map((g) => ({
-            id: g.seriesId,
-            name: g.groupName,
-            categoryName: g.categoryName,
-            team_count: g.standings.length,
-            currentTeamCount: g.standings.length,
-          }))}
-          onClose={() => {
-            setChangingTeam(null);
-            loadStandings(); // Reload standings after change
-          }}
-        />
-      )}
     </div>
   );
 }

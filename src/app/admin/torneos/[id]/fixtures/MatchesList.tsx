@@ -86,9 +86,14 @@ export function MatchesList({ matches, onUpdate }: Props) {
     {} as Record<string, Record<string, Match[]>>
   );
 
+  // Sort categories alphabetically
+  const sortedCategories = Object.entries(matchesByCategory).sort(([a], [b]) =>
+    a.localeCompare(b, 'es', { numeric: true })
+  );
+
   return (
     <div className="space-y-8">
-      {Object.entries(matchesByCategory).map(([categoryName, seriesGroups]) => (
+      {sortedCategories.map(([categoryName, seriesGroups]) => (
         <div key={categoryName} className="space-y-4">
           {/* Category Header */}
           <div className="bg-[#dbf228]/10 border border-[#dbf228]/30 rounded-lg p-4">

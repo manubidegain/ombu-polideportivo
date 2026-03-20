@@ -8,6 +8,7 @@ import { es } from 'date-fns/locale';
 import { AddTeamButton } from './AddTeamButton';
 import { RegistrationActions } from './RegistrationActions';
 import { EditPlayerNames } from './EditPlayerNames';
+import { ExportButton } from './ExportButton';
 
 export default async function TournamentRegistrationsPage({
   params,
@@ -127,7 +128,10 @@ export default async function TournamentRegistrationsPage({
               <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2">INSCRIPCIONES</h1>
               <p className="font-body text-[14px] sm:text-[16px] text-gray-400">{tournament.name}</p>
             </div>
-            <AddTeamButton tournamentId={id} categories={categoriesWithCounts} />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <ExportButton tournamentId={id} />
+              <AddTeamButton tournamentId={id} categories={categoriesWithCounts} />
+            </div>
           </div>
         </div>
 

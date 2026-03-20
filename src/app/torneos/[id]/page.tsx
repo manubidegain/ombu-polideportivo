@@ -126,8 +126,14 @@ export default async function TournamentPublicPage({
             </div>
           </div>
 
-          {/* Gallery Link */}
-          <div className="mt-6">
+          {/* Action Links */}
+          <div className="mt-6 flex flex-wrap gap-4 justify-center">
+            <Link
+              href={`/torneos/${id}/partidos`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#dbf228] hover:bg-[#c5db23] text-[#1b1b1b] rounded-lg font-heading text-[14px] transition-colors"
+            >
+              VER PARTIDOS Y POSICIONES
+            </Link>
             <Link
               href={`/torneos/${id}/galeria`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-body text-[14px] transition-colors"
