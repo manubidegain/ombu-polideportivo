@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, Clock, MapPin, Edit, Settings } from 'lucide-react';
 import { MatchResultModal } from './MatchResultModal';
@@ -92,12 +92,12 @@ export function MatchesList({ matches, onUpdate }: Props) {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {sortedCategories.map(([categoryName, seriesGroups]) => (
-        <div key={categoryName} className="space-y-4">
+        <div key={categoryName} className="space-y-3 sm:space-y-4">
           {/* Category Header */}
-          <div className="bg-[#dbf228]/10 border border-[#dbf228]/30 rounded-lg p-4">
-            <h2 className="font-heading text-[22px] text-[#dbf228]">
+          <div className="bg-[#dbf228]/10 border border-[#dbf228]/30 rounded-lg p-3 sm:p-4">
+            <h2 className="font-heading text-[18px] sm:text-[22px] text-[#dbf228]">
               {categoryName}
             </h2>
           </div>
@@ -105,47 +105,47 @@ export function MatchesList({ matches, onUpdate }: Props) {
           {/* Series within category */}
           {Object.entries(seriesGroups).map(([seriesName, seriesMatches]) => (
             <div key={seriesName} className="ml-0 sm:ml-4">
-              <h3 className="font-heading text-[18px] text-white mb-3 pb-2 border-b border-white/10">
+              <h3 className="font-heading text-[16px] sm:text-[18px] text-white mb-2 sm:mb-3 pb-2 border-b border-white/10">
                 {seriesName}
               </h3>
               <div className="space-y-2">
                 {seriesMatches.map((match) => (
               <div
                 key={match.id}
-                className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-[#dbf228]/50 transition-colors"
+                className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4 hover:border-[#dbf228]/50 transition-colors"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   {/* Teams */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <span className="font-body text-[16px] text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                      <span className="font-body text-[14px] sm:text-[16px] text-white">
                         {match.team1.team_name}
                       </span>
-                      <span className="font-body text-[14px] text-gray-400">vs</span>
-                      <span className="font-body text-[16px] text-white">
+                      <span className="font-body text-[12px] sm:text-[14px] text-gray-400">vs</span>
+                      <span className="font-body text-[14px] sm:text-[16px] text-white">
                         {match.team2.team_name}
                       </span>
                     </div>
 
                     {/* Match Details */}
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-gray-400">
+                    <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 mt-2 text-gray-400">
                       {match.scheduled_date ? (
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span className="font-body text-[12px]">
-                            {format(new Date(match.scheduled_date), "d MMM yyyy", {
+                          <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <span className="font-body text-[11px] sm:text-[12px]">
+                            {format(parseISO(match.scheduled_date), "d MMM yyyy", {
                               locale: es,
                             })}
                           </span>
                         </div>
                       ) : (
-                        <span className="font-body text-[12px] text-red-400">Sin fecha</span>
+                        <span className="font-body text-[11px] sm:text-[12px] text-red-400">Sin fecha</span>
                       )}
 
                       {match.scheduled_time && (
                         <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span className="font-body text-[12px]">
+                          <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <span className="font-body text-[11px] sm:text-[12px]">
                             {match.scheduled_time.slice(0, 5)}
                           </span>
                         </div>
@@ -153,26 +153,26 @@ export function MatchesList({ matches, onUpdate }: Props) {
 
                       {match.court && (
                         <div className="flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5" />
-                          <span className="font-body text-[12px]">{match.court.name}</span>
+                          <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <span className="font-body text-[11px] sm:text-[12px]">{match.court.name}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Status & Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sm:shrink-0">
                     {getStatusBadge(match.status)}
                     <button
                       onClick={() => setEditingMatch(match)}
-                      className="p-2 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 transition-colors"
+                      className="p-1.5 sm:p-2 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 hover:text-blue-300 transition-colors"
                       title="Editar horario/cancha"
                     >
                       <Settings className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setSelectedMatch(match)}
-                      className="p-2 rounded bg-white/10 hover:bg-white/20 text-gray-400 hover:text-white transition-colors"
+                      className="p-1.5 sm:p-2 rounded bg-white/10 hover:bg-white/20 text-gray-400 hover:text-white transition-colors"
                       title="Cargar resultado"
                     >
                       <Edit className="w-4 h-4" />

@@ -157,17 +157,17 @@ export default async function TournamentFixturesPage({
 
   return (
     <div className="min-h-screen bg-[#1b1b1b]">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-12">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href={`/admin/torneos/${id}`}
             className="inline-flex items-center font-body text-[14px] text-gray-400 hover:text-white mb-4"
           >
             ← Volver al torneo
           </Link>
-          <h1 className="font-heading text-[48px] text-white mb-2">FIXTURE</h1>
-          <p className="font-body text-[16px] text-gray-400">
+          <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2">FIXTURE</h1>
+          <p className="font-body text-[14px] sm:text-[16px] text-gray-400">
             Generar series y programar partidos para {tournament.name}
           </p>
         </div>

@@ -42,15 +42,15 @@ export function FixturesClient({ matches }: Props) {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-      <h2 className="font-heading text-[24px] text-white mb-6">
+    <div className="bg-white/5 border border-white/10 rounded-lg p-4 sm:p-6">
+      <h2 className="font-heading text-[18px] sm:text-[24px] text-white mb-4 sm:mb-6">
         PARTIDOS GENERADOS ({matches?.length || 0})
       </h2>
 
       {matches && matches.length > 0 ? (
         <MatchesList matches={matches} onUpdate={handleUpdate} />
       ) : (
-        <p className="text-center text-gray-400 py-8">
+        <p className="text-center text-gray-400 py-8 text-[14px] sm:text-[16px]">
           No se han generado partidos todavía. Usa el generador de fixture arriba para crear series
           y partidos.
         </p>

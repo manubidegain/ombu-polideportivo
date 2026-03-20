@@ -148,23 +148,23 @@ export function CreateMatchModal({ tournamentId, availableSeries, onClose }: Pro
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1b1b1b] border border-white/20 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto my-8">
+      <div className="bg-[#1b1b1b] border border-white/20 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto my-4 sm:my-8">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <Plus className="w-6 h-6 text-[#dbf228]" />
-            <h2 className="font-heading text-[20px] text-white">CREAR PARTIDO MANUAL</h2>
+            <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-[#dbf228]" />
+            <h2 className="font-heading text-[16px] sm:text-[20px] text-white">CREAR PARTIDO MANUAL</h2>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Series Selection */}
           <div>
             <label className="block font-body text-[14px] text-white mb-2">
@@ -272,7 +272,7 @@ export function CreateMatchModal({ tournamentId, availableSeries, onClose }: Pro
                   type="date"
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white font-body text-[14px] focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white font-body text-[14px] focus:outline-none focus:ring-2 focus:ring-[#dbf228] scheme-dark"
                 />
               </div>
 
@@ -283,7 +283,7 @@ export function CreateMatchModal({ tournamentId, availableSeries, onClose }: Pro
                   type="time"
                   value={scheduledTime}
                   onChange={(e) => setScheduledTime(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white font-body text-[14px] focus:outline-none focus:ring-2 focus:ring-[#dbf228]"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white font-body text-[14px] focus:outline-none focus:ring-2 focus:ring-[#dbf228] scheme-dark"
                 />
               </div>
 
@@ -304,25 +304,25 @@ export function CreateMatchModal({ tournamentId, availableSeries, onClose }: Pro
                 </select>
               </div>
             </div>
-            <p className="mt-2 font-body text-[12px] text-gray-400">
+            <p className="mt-2 font-body text-[11px] sm:text-[12px] text-gray-400">
               Podés dejar estos campos vacíos y asignar horarios después
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 bg-white/10 text-white font-heading text-[14px] py-3 px-6 rounded hover:bg-white/20 transition-colors disabled:opacity-50"
+              className="flex-1 bg-white/10 text-white font-heading text-[13px] sm:text-[14px] py-3 px-4 sm:px-6 rounded hover:bg-white/20 transition-colors disabled:opacity-50"
             >
               CANCELAR
             </button>
             <button
               type="submit"
               disabled={loading || !selectedSeriesId || !team1Id || !team2Id}
-              className="flex-1 bg-[#dbf228] text-[#1b1b1b] font-heading text-[14px] py-3 px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 bg-[#dbf228] text-[#1b1b1b] font-heading text-[13px] sm:text-[14px] py-3 px-4 sm:px-6 rounded hover:bg-[#c5db23] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading && <ButtonBallSpinner />}
               {loading ? 'CREANDO...' : 'CREAR PARTIDO'}
