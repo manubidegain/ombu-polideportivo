@@ -31,9 +31,11 @@ type GroupStanding = {
 
 type Props = {
   tournamentId: string;
+  selectedCategory?: string;
+  selectedSeries?: string;
 };
 
-export function PublicStandings({ tournamentId }: Props) {
+export function PublicStandings({ tournamentId, selectedCategory = 'all', selectedSeries = 'all' }: Props) {
   const [groups, setGroups] = useState<GroupStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,8 +108,19 @@ export function PublicStandings({ tournamentId }: Props) {
     );
   }
 
+  // Filter groups based on selected filters
+  const filteredGroups = groups.filter(group => {
+    if (selectedCategory !== 'all' && group.categoryName !== selectedCategory) {
+      return false;
+    }
+    if (selectedSeries !== 'all' && group.groupName !== selectedSeries) {
+      return false;
+    }
+    return true;
+  });
+
   // Group by category
-  const groupsByCategory = groups.reduce((acc, group) => {
+  const groupsByCategory = filteredGroups.reduce((acc, group) => {
     const category = group.categoryName || 'Sin Categoría';
     if (!acc[category]) {
       acc[category] = [];
@@ -267,13 +280,25 @@ export function PublicStandings({ tournamentId }: Props) {
                               </span>
                             </td>
                             <td className="text-center px-3 py-4">
-                              <span className="font-body text-[12px] text-gray-300">
-                                {team.setsWon}-{team.setsLost}
+                              <span className={`font-body text-[13px] font-medium ${
+                                team.setsWon - team.setsLost > 0
+                                  ? 'text-green-400'
+                                  : team.setsWon - team.setsLost < 0
+                                  ? 'text-red-400'
+                                  : 'text-gray-400'
+                              }`}>
+                                {team.setsWon - team.setsLost > 0 ? '+' : ''}{team.setsWon - team.setsLost}
                               </span>
                             </td>
                             <td className="text-center px-3 py-4">
-                              <span className="font-body text-[12px] text-gray-300">
-                                {team.gamesWon}-{team.gamesLost}
+                              <span className={`font-body text-[13px] font-medium ${
+                                team.gamesWon - team.gamesLost > 0
+                                  ? 'text-green-400'
+                                  : team.gamesWon - team.gamesLost < 0
+                                  ? 'text-red-400'
+                                  : 'text-gray-400'
+                              }`}>
+                                {team.gamesWon - team.gamesLost > 0 ? '+' : ''}{team.gamesWon - team.gamesLost}
                               </span>
                             </td>
                           </tr>

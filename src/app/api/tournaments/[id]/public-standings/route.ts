@@ -86,7 +86,7 @@ export async function GET(
               matchesLost++;
             }
 
-            // Calculate sets and games
+            // Calculate sets and games (exclude supertiebreak from games count)
             if (match.score?.sets) {
               match.score.sets.forEach((set: any) => {
                 if (isTeam1) {
@@ -101,6 +101,17 @@ export async function GET(
                   gamesLost += set.team1;
                 }
               });
+            }
+
+            // Supertiebreak counts as a set but points don't count as games
+            if (match.score?.supertiebreak) {
+              if (isTeam1) {
+                setsWon += match.score.supertiebreak.team1 > match.score.supertiebreak.team2 ? 1 : 0;
+                setsLost += match.score.supertiebreak.team2 > match.score.supertiebreak.team1 ? 1 : 0;
+              } else {
+                setsWon += match.score.supertiebreak.team2 > match.score.supertiebreak.team1 ? 1 : 0;
+                setsLost += match.score.supertiebreak.team1 > match.score.supertiebreak.team2 ? 1 : 0;
+              }
             }
           });
 

@@ -10,6 +10,7 @@ import { BracketView } from './BracketView';
 import { FixturesClient } from './FixturesClient';
 import { GenerateMatchesButtonSimple } from './GenerateMatchesButtonSimple';
 import { CreateMatchButton } from './CreateMatchButton';
+import { ExportMatchesButton } from './ExportMatchesButton';
 
 export default async function TournamentFixturesPage({
   params,
@@ -166,10 +167,17 @@ export default async function TournamentFixturesPage({
           >
             ← Volver al torneo
           </Link>
-          <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2">FIXTURE</h1>
-          <p className="font-body text-[14px] sm:text-[16px] text-gray-400">
-            Generar series y programar partidos para {tournament.name}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="font-heading text-[32px] sm:text-[48px] text-white mb-2">FIXTURE</h1>
+              <p className="font-body text-[14px] sm:text-[16px] text-gray-400">
+                Generar series y programar partidos para {tournament.name}
+              </p>
+            </div>
+            {matches && matches.length > 0 && (
+              <ExportMatchesButton tournamentId={id} />
+            )}
+          </div>
         </div>
 
         {/* Smart Fixture Generator */}

@@ -183,7 +183,7 @@ export function PublicFixturesClient({
                 setSelectedCategory(e.target.value);
                 setSelectedSeries('all'); // Reset series when category changes
               }}
-              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all"
+              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all [&>option]:bg-[#1b1b1b] [&>option]:text-white"
             >
               <option value="all">Todas las categorías</option>
               {categories.map((cat) => (
@@ -197,7 +197,7 @@ export function PublicFixturesClient({
             <select
               value={selectedSeries}
               onChange={(e) => setSelectedSeries(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all"
+              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all disabled:opacity-50 [&>option]:bg-[#1b1b1b] [&>option]:text-white"
               disabled={availableSeries.length === 0}
             >
               <option value="all">Todas las series</option>
@@ -212,7 +212,7 @@ export function PublicFixturesClient({
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all"
+              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all [&>option]:bg-[#1b1b1b] [&>option]:text-white"
             >
               <option value="all">Todos los estados</option>
               <option value="scheduled">Programados</option>
@@ -273,7 +273,11 @@ export function PublicFixturesClient({
 
       {/* Content */}
       {viewMode === 'standings' ? (
-        <PublicStandings tournamentId={tournamentId} />
+        <PublicStandings
+          tournamentId={tournamentId}
+          selectedCategory={selectedCategory}
+          selectedSeries={selectedSeries}
+        />
       ) : viewMode === 'list' ? (
         <div className="space-y-3">
           {filteredMatches.length === 0 ? (
