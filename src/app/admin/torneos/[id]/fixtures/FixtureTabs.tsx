@@ -36,6 +36,9 @@ type Series = {
   name: string;
   phase: string;
   category_id: string;
+  tournament_categories?: {
+    name: string;
+  };
 };
 
 type Props = {

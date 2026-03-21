@@ -257,6 +257,7 @@ export default async function TournamentFixturesPage({
               name: s.name,
               phase: s.phase,
               category_id: s.category_id,
+              tournament_categories: s.tournament_categories,
             }))}
             hasGroupSeries={series.some(s => s.phase === 'groups')}
           />
