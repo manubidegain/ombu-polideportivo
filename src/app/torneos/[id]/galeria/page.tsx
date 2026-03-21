@@ -1,7 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { PhotoGrid } from '@/app/admin/torneos/[id]/galeria/PhotoGrid';
+import { PublicPhotoGrid } from './PublicPhotoGrid';
 
 export default async function TournamentGalleryPublicPage({
   params,
@@ -49,7 +49,7 @@ export default async function TournamentGalleryPublicPage({
         {/* Photos */}
         <div className="bg-white rounded-lg p-6 shadow-sm">
           {photos && photos.length > 0 ? (
-            <PhotoGrid photos={photos} tournamentId={id} isAdmin={false} />
+            <PublicPhotoGrid photos={photos} tournamentId={id} />
           ) : (
             <div className="text-center py-16">
               <p className="font-body text-[16px] text-gray-600 mb-4">

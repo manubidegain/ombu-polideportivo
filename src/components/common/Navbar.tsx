@@ -36,7 +36,7 @@ export default function Navbar() {
         <div className="w-full px-4 md:px-8 lg:px-[142px]">
           <div className="flex items-center justify-between h-[89px]">
             {/* Logo */}
-            <Link href="/" className="font-heading text-[18px] sm:text-[20px] md:text-[24px] leading-[100%]">
+            <Link href="/" className="font-heading text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] leading-[100%]">
               POLIDEPORTIVO OMBÚ
             </Link>
 

@@ -32,9 +32,10 @@ type Match = {
 
 type Props = {
   matches: Match[];
+  tournamentId: string;
 };
 
-export function FixturesClient({ matches }: Props) {
+export function FixturesClient({ matches, tournamentId }: Props) {
   const router = useRouter();
 
   const handleUpdate = () => {
@@ -48,7 +49,7 @@ export function FixturesClient({ matches }: Props) {
       </h2>
 
       {matches && matches.length > 0 ? (
-        <MatchesList matches={matches} onUpdate={handleUpdate} />
+        <MatchesList matches={matches} tournamentId={tournamentId} onUpdate={handleUpdate} />
       ) : (
         <p className="text-center text-gray-400 py-8 text-[14px] sm:text-[16px]">
           No se han generado partidos todavía. Usa el generador de fixture arriba para crear series

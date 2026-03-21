@@ -103,16 +103,16 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
 
             {/* Admin Actions */}
             {isAdmin && (
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-black/60 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFeatured(photo);
                   }}
-                  className={`p-2 rounded ${photo.is_featured ? 'bg-[#dbf228] text-[#1b1b1b]' : 'bg-white/20 text-white'} hover:bg-white/30 transition-colors`}
+                  className={`p-2 sm:p-2.5 rounded ${photo.is_featured ? 'bg-[#dbf228] text-[#1b1b1b]' : 'bg-white/20 text-white'} hover:bg-white/30 transition-colors`}
                   title={photo.is_featured ? 'Quitar destacada' : 'Marcar como destacada'}
                 >
-                  <Star className="w-5 h-5" fill={photo.is_featured ? 'currentColor' : 'none'} />
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5" fill={photo.is_featured ? 'currentColor' : 'none'} />
                 </button>
 
                 <button
@@ -121,13 +121,13 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
                     handleDelete(photo);
                   }}
                   disabled={deleting === photo.id}
-                  className="p-2 bg-red-500/80 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="p-2 sm:p-2.5 bg-red-500/80 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50"
                   title="Eliminar"
                 >
                   {deleting === photo.id ? (
                     <ButtonBallSpinner />
                   ) : (
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   )}
                 </button>
               </div>

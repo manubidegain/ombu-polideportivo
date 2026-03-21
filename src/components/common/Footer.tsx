@@ -1,8 +1,9 @@
 import { Instagram, MessageCircle } from 'lucide-react';
+
 import Link from 'next/link';
 
 // Logo desde Figma
-const imgLogo = "https://www.figma.com/api/mcp/asset/59d36321-9c9f-4d83-baf2-4cdbc8041247";
+const imgLogo = "/logo.png";
 
 export default function Footer() {
   return (

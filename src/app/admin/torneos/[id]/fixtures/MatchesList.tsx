@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, Clock, MapPin, Edit, Settings } from 'lucide-react';
+import { Calendar, Clock, MapPin, Edit, Settings, Trash2 } from 'lucide-react';
 import { MatchResultModal } from './MatchResultModal';
 import { EditMatchModal } from './EditMatchModal';
+import { DeleteMatchModal } from './DeleteMatchModal';
 
 type Match = {
   id: string;
@@ -36,12 +37,14 @@ type Match = {
 
 type Props = {
   matches: Match[];
+  tournamentId: string;
   onUpdate?: () => void;
 };
 
-export function MatchesList({ matches, onUpdate }: Props) {
+export function MatchesList({ matches, tournamentId, onUpdate }: Props) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
+  const [deletingMatch, setDeletingMatch] = useState<Match | null>(null);
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -177,6 +180,13 @@ export function MatchesList({ matches, onUpdate }: Props) {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
+                    <button
+                      onClick={() => setDeletingMatch(match)}
+                      className="p-1.5 sm:p-2 rounded bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-colors"
+                      title="Eliminar partido"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
@@ -225,6 +235,19 @@ export function MatchesList({ matches, onUpdate }: Props) {
           onClose={() => setSelectedMatch(null)}
           onSuccess={() => {
             setSelectedMatch(null);
+            if (onUpdate) onUpdate();
+          }}
+        />
+      )}
+
+      {/* Delete Match Modal */}
+      {deletingMatch && (
+        <DeleteMatchModal
+          match={deletingMatch}
+          tournamentId={tournamentId}
+          onClose={() => setDeletingMatch(null)}
+          onSuccess={() => {
+            setDeletingMatch(null);
             if (onUpdate) onUpdate();
           }}
         />

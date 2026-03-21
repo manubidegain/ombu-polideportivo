@@ -4,13 +4,11 @@ import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SmartFixtureGenerator } from './SmartFixtureGenerator';
-import { GroupStandings } from './GroupStandings';
 import { PlayoffGenerator } from './PlayoffGenerator';
 import { BracketView } from './BracketView';
-import { FixturesClient } from './FixturesClient';
 import { GenerateMatchesButtonSimple } from './GenerateMatchesButtonSimple';
-import { CreateMatchButton } from './CreateMatchButton';
 import { ExportMatchesButton } from './ExportMatchesButton';
+import { FixtureTabs } from './FixtureTabs';
 
 export default async function TournamentFixturesPage({
   params,
@@ -188,10 +186,9 @@ export default async function TournamentFixturesPage({
           />
         </div>
 
-        {/* Group Standings */}
+        {/* Generate Matches Button */}
         {series && series.length > 0 && series.some(s => s.phase === 'groups') && (
           <div className="mb-8">
-            {/* Show generate matches button if series exist */}
             <GenerateMatchesButtonSimple
               tournamentId={id}
               categories={(() => {
@@ -230,16 +227,6 @@ export default async function TournamentFixturesPage({
                 }));
               })()}
             />
-
-            <div className="mb-4">
-              <h2 className="font-heading text-[24px] text-white mb-1">
-                POSICIONES
-              </h2>
-              <p className="font-body text-[14px] text-gray-400">
-                Tabla de posiciones de las series generadas
-              </p>
-            </div>
-            <GroupStandings tournamentId={id} />
           </div>
         )}
 
@@ -260,23 +247,20 @@ export default async function TournamentFixturesPage({
           </div>
         )}
 
-        {/* Existing Matches */}
-        <div className="space-y-4">
-          {/* Create Match Button - Show only if series exist */}
-          {series && series.length > 0 && (
-            <CreateMatchButton
-              tournamentId={id}
-              availableSeries={(series || []).map(s => ({
-                id: s.id,
-                name: s.name,
-                phase: s.phase,
-                category_id: s.category_id,
-              }))}
-            />
-          )}
-
-          <FixturesClient matches={matches} />
-        </div>
+        {/* Matches and Standings Tabs */}
+        {series && series.length > 0 && (
+          <FixtureTabs
+            matches={matches}
+            tournamentId={id}
+            availableSeries={(series || []).map(s => ({
+              id: s.id,
+              name: s.name,
+              phase: s.phase,
+              category_id: s.category_id,
+            }))}
+            hasGroupSeries={series.some(s => s.phase === 'groups')}
+          />
+        )}
       </div>
     </div>
   );
