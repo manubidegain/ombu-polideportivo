@@ -125,14 +125,20 @@ export function compareTeams(
   team2: TeamStats,
   matches: MatchResult[]
 ): number {
-  // 1. Sets won (higher is better)
-  if (team1.setsWon !== team2.setsWon) {
-    return team2.setsWon - team1.setsWon;
+  // 1. Set difference (higher is better)
+  const team1SetDiff = team1.setsWon - team1.setsLost;
+  const team2SetDiff = team2.setsWon - team2.setsLost;
+
+  if (team1SetDiff !== team2SetDiff) {
+    return team2SetDiff - team1SetDiff;
   }
 
-  // 2. Games won (higher is better)
-  if (team1.gamesWon !== team2.gamesWon) {
-    return team2.gamesWon - team1.gamesWon;
+  // 2. Game difference (higher is better)
+  const team1GameDiff = team1.gamesWon - team1.gamesLost;
+  const team2GameDiff = team2.gamesWon - team2.gamesLost;
+
+  if (team1GameDiff !== team2GameDiff) {
+    return team2GameDiff - team1GameDiff;
   }
 
   // 3. Head-to-head result

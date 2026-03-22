@@ -14,6 +14,7 @@ import {
   formatBracketForDatabase,
 } from '@/lib/tournaments/bracket-generator';
 import { createSeries } from '@/lib/tournaments/fixture-generator';
+import { getPlayoffStructure } from '@/lib/tournaments/playoff-rules';
 
 export async function POST(
   request: Request,
@@ -27,7 +28,7 @@ export async function POST(
 
     const { id: tournamentId } = await params;
     const body = await request.json();
-    const { categoryId, qualificationRule } = body;
+    const { categoryId, qualificationRule, useAutoRules = false } = body;
 
     if (!categoryId || !qualificationRule) {
       return NextResponse.json(
@@ -142,37 +143,125 @@ export async function POST(
       );
     }
 
-    // Create playoff series
-    type PlayoffSeriesIds = { quarterFinals?: string; semiFinals: string; final: string };
+    // Determine playoff structure
+    let playoffStructure: any = null;
+    if (useAutoRules) {
+      playoffStructure = getPlayoffStructure(qualifiers.length);
+      if (!playoffStructure.supported) {
+        return NextResponse.json(
+          { error: playoffStructure.errorMessage || 'Estructura de playoffs no soportada' },
+          { status: 400 }
+        );
+      }
+
+      // For now, only support structures that fit in the current bracket generator (2-8 teams)
+      // This excludes 9, 12, and 15 team structures until bracket-generator is extended
+      if (qualifiers.length > 8) {
+        return NextResponse.json(
+          {
+            error:
+              'El sistema automático actualmente solo soporta hasta 8 equipos. Usá el modo manual para más equipos.',
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Create playoff series dynamically based on structure
+    type PlayoffSeriesIds = {
+      octavos?: string;
+      cuartos?: string;
+      quarterFinals?: string;
+      semiFinals: string;
+      final: string;
+    };
     const playoffSeriesIds: PlayoffSeriesIds = {
       semiFinals: '',
       final: '',
     };
 
-    if (bracket.quarterFinals.length > 0) {
-      const qfSeries = await createSeries(
+    let currentOrder = 1;
+
+    // If using auto rules, create series based on rounds
+    if (useAutoRules && playoffStructure) {
+      for (const round of playoffStructure.rounds) {
+        if (round.name === 'Octavos') {
+          const octSeries = await createSeries(
+            tournamentId,
+            categoryId,
+            'Octavos de Final',
+            currentOrder++,
+            round.qualifiersNeeded,
+            'playoffs'
+          );
+          playoffSeriesIds.octavos = octSeries.id;
+        } else if (round.name === 'Cuartos' || round.name === 'Cuarto') {
+          const qfSeries = await createSeries(
+            tournamentId,
+            categoryId,
+            round.name === 'Cuartos' ? 'Cuartos de Final' : 'Cuarto de Final',
+            currentOrder++,
+            round.qualifiersNeeded,
+            'playoffs'
+          );
+          playoffSeriesIds.cuartos = qfSeries.id;
+          playoffSeriesIds.quarterFinals = qfSeries.id; // Alias for compatibility
+        } else if (round.name === 'Semis') {
+          const sfSeries = await createSeries(
+            tournamentId,
+            categoryId,
+            'Semifinales',
+            currentOrder++,
+            round.qualifiersNeeded,
+            'playoffs'
+          );
+          playoffSeriesIds.semiFinals = sfSeries.id;
+        } else if (round.name === 'Final') {
+          const finalSeries = await createSeries(
+            tournamentId,
+            categoryId,
+            'Final',
+            currentOrder++,
+            round.qualifiersNeeded,
+            'finals'
+          );
+          playoffSeriesIds.final = finalSeries.id;
+        }
+      }
+    } else {
+      // Manual mode: use existing logic
+      if (bracket.quarterFinals.length > 0) {
+        const qfSeries = await createSeries(
+          tournamentId,
+          categoryId,
+          'Cuartos de Final',
+          currentOrder++,
+          8,
+          'playoffs'
+        );
+        playoffSeriesIds.quarterFinals = qfSeries.id;
+      }
+
+      const sfSeries = await createSeries(
         tournamentId,
         categoryId,
-        'Cuartos de Final',
-        1,
-        8,
+        'Semifinales',
+        currentOrder++,
+        4,
         'playoffs'
       );
-      playoffSeriesIds.quarterFinals = qfSeries.id;
+      playoffSeriesIds.semiFinals = sfSeries.id;
+
+      const finalSeries = await createSeries(
+        tournamentId,
+        categoryId,
+        'Final',
+        currentOrder++,
+        2,
+        'finals'
+      );
+      playoffSeriesIds.final = finalSeries.id;
     }
-
-    const sfSeries = await createSeries(
-      tournamentId,
-      categoryId,
-      'Semifinales',
-      2,
-      4,
-      'playoffs'
-    );
-    playoffSeriesIds.semiFinals = sfSeries.id;
-
-    const finalSeries = await createSeries(tournamentId, categoryId, 'Final', 3, 2, 'finals');
-    playoffSeriesIds.final = finalSeries.id;
 
     // Format and save matches
     const playoffMatches = formatBracketForDatabase(bracket, playoffSeriesIds);
