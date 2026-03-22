@@ -146,7 +146,12 @@ export async function POST(
     // Determine playoff structure
     let playoffStructure: any = null;
     if (useAutoRules) {
-      playoffStructure = getPlayoffStructure(qualifiers.length);
+      // Get total team count from all groups (not qualifiers)
+      const totalTeamCount = groupSeries.reduce((sum, series) => {
+        return sum + (series.tournament_series_teams?.length || 0);
+      }, 0);
+
+      playoffStructure = getPlayoffStructure(totalTeamCount);
       if (!playoffStructure.supported) {
         return NextResponse.json(
           { error: playoffStructure.errorMessage || 'Estructura de playoffs no soportada' },

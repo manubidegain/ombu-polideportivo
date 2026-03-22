@@ -59,6 +59,7 @@ export function PublicFixturesClient({
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'standings'>('list');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
+  const [selectedPhase, setSelectedPhase] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [approvingMatch, setApprovingMatch] = useState<Match | null>(null);
@@ -78,6 +79,10 @@ export function PublicFixturesClient({
     )
   ).sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
 
+  // Determine if there are playoff matches
+  const hasPlayoffs = matches.some(m => m.series.phase === 'playoffs' || m.series.phase === 'finals');
+  const hasGroups = matches.some(m => m.series.phase === 'groups');
+
   // Filter matches
   const filteredMatches = matches.filter((match) => {
     if (selectedCategory !== 'all' && match.series.category !== selectedCategory) {
@@ -85,6 +90,10 @@ export function PublicFixturesClient({
     }
     if (selectedSeries !== 'all' && match.series.name !== selectedSeries) {
       return false;
+    }
+    if (selectedPhase !== 'all') {
+      if (selectedPhase === 'groups' && match.series.phase !== 'groups') return false;
+      if (selectedPhase === 'playoffs' && match.series.phase !== 'playoffs' && match.series.phase !== 'finals') return false;
     }
     if (selectedStatus !== 'all' && match.status !== selectedStatus) {
       return false;
@@ -207,6 +216,19 @@ export function PublicFixturesClient({
                 </option>
               ))}
             </select>
+
+            {/* Phase Filter - Only show if both groups and playoffs exist */}
+            {hasGroups && hasPlayoffs && (
+              <select
+                value={selectedPhase}
+                onChange={(e) => setSelectedPhase(e.target.value)}
+                className="bg-white/10 border border-white/20 rounded px-3 py-1.5 font-body text-[14px] text-white focus:outline-none focus:ring-2 focus:ring-[#dbf228]/50 transition-all [&>option]:bg-[#1b1b1b] [&>option]:text-white"
+              >
+                <option value="all">Todas las fases</option>
+                <option value="groups">Grupos</option>
+                <option value="playoffs">Playoffs</option>
+              </select>
+            )}
 
             {/* Status Filter */}
             <select

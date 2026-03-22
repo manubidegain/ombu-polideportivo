@@ -92,8 +92,10 @@ export function generatePlayoffBracket(
     return { roundOf16: [], quarterFinals: [], semiFinals: [], final, totalMatches: 1 };
   }
 
-  // 3-4 teams: Semis + Final
-  if (qualifierCount <= 4) {
+  // 3-6 teams: Semis + Final (crossed semifinals)
+  if (qualifierCount <= 6) {
+    // For 3-4: sf1 = 1 vs 4, sf2 = 2 vs 3
+    // For 5-6: sf1 = 1 vs 4, sf2 = 2 vs 3 (seeds 5-6 are null)
     const sf1 = createMatch('semi-final', 1, seededQualifiers[0]?.teamId || null, seededQualifiers[3]?.teamId || null, 1);
     const sf2 = createMatch('semi-final', 2, seededQualifiers[1]?.teamId || null, seededQualifiers[2]?.teamId || null, 2);
     final = createMatch('final', 1, null, null, 1);
@@ -105,7 +107,7 @@ export function generatePlayoffBracket(
     return { roundOf16: [], quarterFinals: [], semiFinals, final, totalMatches: 3 };
   }
 
-  // 5-8 teams: Cuartos + Semis + Final (standard bracket)
+  // 7-8 teams: Cuartos + Semis + Final (standard bracket)
   if (qualifierCount <= 8) {
     const seeds = Array(8).fill(null).map((_, i) => seededQualifiers[i]?.teamId || null);
 
@@ -131,10 +133,10 @@ export function generatePlayoffBracket(
     return { roundOf16: [], quarterFinals, semiFinals, final, totalMatches: 7 };
   }
 
-  // 9 teams: 3 groups of 3
+  // 7 qualifiers from 9 teams (3 groups of 3): 3 primeros + 3 segundos + mejor tercero
   // Primeros esperan en semis, mejor 2° vs mejor 3° (oct1), otros dos segundos juegan oct2
   // Ganadores de octavos juegan cuarto, ganador de cuarto vs 3er primero en semi
-  if (qualifierCount === 9) {
+  if (qualifierCount === 7) {
     // Octavos: 2 matches
     const oct1 = createMatch('round-of-16', 1, seededQualifiers[3]?.teamId || null, seededQualifiers[6]?.teamId || null, 1); // Mejor 2° vs Mejor 3°
     const oct2 = createMatch('round-of-16', 2, seededQualifiers[4]?.teamId || null, seededQualifiers[5]?.teamId || null, 2); // 2° segundo vs 3° segundo
@@ -342,8 +344,9 @@ export function formatBracketForDatabase(
 export function calculatePlayoffMatches(qualifierCount: number): number {
   if (qualifierCount <= 2) return 1;
   if (qualifierCount <= 4) return 3; // 2 SF + 1 F
-  if (qualifierCount <= 8) return 7; // 4 QF + 2 SF + 1 F
-  if (qualifierCount === 9) return 6; // 2 Oct + 1 QF + 2 SF + 1 F
+  if (qualifierCount <= 6) return 3; // 2 SF + 1 F
+  if (qualifierCount === 7) return 6; // 2 Oct + 1 QF + 2 SF + 1 F (9 teams → 7 qualifiers)
+  if (qualifierCount === 8) return 7; // 4 QF + 2 SF + 1 F
   if (qualifierCount === 12) return 7; // 4 QF + 2 SF + 1 F
   if (qualifierCount === 15) return 9; // 2 Oct + 4 QF + 2 SF + 1 F
   throw new Error('Unsupported qualifier count');

@@ -213,6 +213,34 @@ export function selectPlayoffQualifiers(
     for (const groupStandings of allGroupStandings) {
       qualifiers.push(groupStandings[0], groupStandings[1]);
     }
+  } else if (qualificationRule === 'top1-best3rds') {
+    // Top 1 from each group + all 2nd place + best 3rd place
+    // Specifically for 9 teams (3 groups of 3): 3 firsts + 3 seconds + 1 best third = 7
+
+    // Add all first place teams
+    for (const groupStandings of allGroupStandings) {
+      qualifiers.push(groupStandings[0]);
+    }
+
+    // Add all second place teams
+    for (const groupStandings of allGroupStandings) {
+      if (groupStandings[1]) {
+        qualifiers.push(groupStandings[1]);
+      }
+    }
+
+    // Collect all third place teams
+    const thirdPlaceTeams = allGroupStandings
+      .map((standings) => standings[2])
+      .filter(Boolean);
+
+    // Sort third place teams using same criteria
+    thirdPlaceTeams.sort((a, b) => compareTeams(a, b, []));
+
+    // Add best third place team
+    if (thirdPlaceTeams.length > 0) {
+      qualifiers.push(thirdPlaceTeams[0]);
+    }
   } else if (qualificationRule.startsWith('top1-best')) {
     // Top 1 from each group + best 2nd place teams
     const bestCount = parseInt(qualificationRule.replace('top1-best', ''));

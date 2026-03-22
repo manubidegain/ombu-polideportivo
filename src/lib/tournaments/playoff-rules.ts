@@ -9,7 +9,7 @@
 export type PlayoffStructure = {
   teamCount: number;
   groupStructure: string; // e.g., "2 series de 3"
-  qualificationRule: 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'custom';
+  qualificationRule: 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'top1-best3rds' | 'custom';
   customQualifiers?: number; // For custom rules
   rounds: PlayoffRound[];
   description: string;
@@ -118,13 +118,13 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
       return {
         teamCount: 9,
         groupStructure: '3 series de 3',
-        qualificationRule: 'custom',
-        customQualifiers: 9, // All teams: 3 primeros + 3 segundos + 3 terceros
+        qualificationRule: 'top1-best3rds', // 3 primeros + 3 segundos + mejor tercero = 7 equipos
+        customQualifiers: 7,
         rounds: [
           {
             name: 'Octavos',
             matchCount: 2,
-            qualifiersNeeded: 6,
+            qualifiersNeeded: 7,
             note: 'Mejor 2° vs Mejor 3°, otros dos segundos juegan el otro octavo'
           },
           {
@@ -141,7 +141,7 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           },
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
-        description: 'Los 3 primeros esperan en semifinales. Mejor segundo vs mejor tercero, otros segundos juegan octavos.',
+        description: '3 primeros + 3 segundos + mejor tercero (7 equipos). Primeros esperan en semis, segundos y mejor tercero juegan octavos.',
         supported: true
       };
 

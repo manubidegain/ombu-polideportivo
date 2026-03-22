@@ -17,7 +17,7 @@ type Props = {
   categories: Category[];
 };
 
-type QualificationRule = 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'top1-top2' | 'custom';
+type QualificationRule = 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'top1-best3rds' | 'top1-top2' | 'custom';
 
 // Bracket Visualization Component
 function BracketVisualization({ teams, structure }: { teams: any[]; structure: any }) {
