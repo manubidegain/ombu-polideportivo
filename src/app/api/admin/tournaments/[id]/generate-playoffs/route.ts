@@ -153,24 +153,11 @@ export async function POST(
           { status: 400 }
         );
       }
-
-      // For now, only support structures that fit in the current bracket generator (2-8 teams)
-      // This excludes 9, 12, and 15 team structures until bracket-generator is extended
-      if (qualifiers.length > 8) {
-        return NextResponse.json(
-          {
-            error:
-              'El sistema automático actualmente solo soporta hasta 8 equipos. Usá el modo manual para más equipos.',
-          },
-          { status: 400 }
-        );
-      }
     }
 
     // Create playoff series dynamically based on structure
     type PlayoffSeriesIds = {
-      octavos?: string;
-      cuartos?: string;
+      roundOf16?: string;
       quarterFinals?: string;
       semiFinals: string;
       final: string;
@@ -194,7 +181,7 @@ export async function POST(
             round.qualifiersNeeded,
             'playoffs'
           );
-          playoffSeriesIds.octavos = octSeries.id;
+          playoffSeriesIds.roundOf16 = octSeries.id;
         } else if (round.name === 'Cuartos' || round.name === 'Cuarto') {
           const qfSeries = await createSeries(
             tournamentId,
@@ -204,8 +191,7 @@ export async function POST(
             round.qualifiersNeeded,
             'playoffs'
           );
-          playoffSeriesIds.cuartos = qfSeries.id;
-          playoffSeriesIds.quarterFinals = qfSeries.id; // Alias for compatibility
+          playoffSeriesIds.quarterFinals = qfSeries.id;
         } else if (round.name === 'Semis') {
           const sfSeries = await createSeries(
             tournamentId,

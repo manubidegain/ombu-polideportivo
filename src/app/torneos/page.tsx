@@ -24,10 +24,12 @@ export default async function TorneosPage() {
     tournamentsByMonth[month].push(tournament);
   });
 
-  // Get the next upcoming tournament
+  // Get the next upcoming or active tournament
   const now = new Date();
   const upcomingTournament = tournaments?.find(
-    (t) => new Date(t.start_date) >= now && t.status === 'registration_open'
+    (t) =>
+      (t.status === 'in_progress') || // Active tournament
+      (new Date(t.start_date) >= now && t.status === 'registration_open') // Upcoming tournament
   );
 
   // Predefined tournament schedule from design
@@ -81,7 +83,7 @@ export default async function TorneosPage() {
                   href={`/torneos/${upcomingTournament.id}`}
                   className="inline-flex items-center bg-white text-[#1b1b1b] font-heading text-[16px] md:text-[20px] py-3 px-12 md:py-4 md:px-20 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  SUMÁTE
+                  {upcomingTournament.status === 'in_progress' ? 'VER TORNEO' : 'SUMÁTE'}
                 </Link>
               )}
             </div>

@@ -142,8 +142,7 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
         description: 'Los 3 primeros esperan en semifinales. Segundos y terceros disputan el 4° lugar mediante octavos y cuarto.',
-        supported: false,
-        errorMessage: 'Estructura de 9 equipos definida pero aún no implementada en el generador de brackets. Próximamente disponible.'
+        supported: true
       };
 
     case 12:
@@ -162,8 +161,7 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
         description: 'Cuartos de Final (primeros y segundos) → Semifinales → Final',
-        supported: false,
-        errorMessage: 'Estructura de 12 equipos definida pero aún no implementada en el generador de brackets. Próximamente disponible.'
+        supported: true
       };
 
     case 15:
@@ -189,8 +187,7 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
         description: 'Los 5 primeros + mejor segundo pasan directo a cuartos. Los otros 4 segundos juegan octavos.',
-        supported: false,
-        errorMessage: 'Estructura de 15 equipos definida pero aún no implementada en el generador de brackets. Próximamente disponible.'
+        supported: true
       };
 
     // Unsupported cases
@@ -267,7 +264,7 @@ export function isTeamCountSupported(teamCount: number): boolean {
  * Get all supported team counts (currently implemented in bracket generator)
  */
 export function getSupportedTeamCounts(): number[] {
-  return [4, 5, 6, 7, 8];
+  return [4, 5, 6, 7, 8, 9, 12, 15];
 }
 
 /**
