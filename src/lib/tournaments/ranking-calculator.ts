@@ -237,6 +237,11 @@ export function selectPlayoffQualifiers(
     for (const groupStandings of allGroupStandings) {
       qualifiers.push(groupStandings[0], groupStandings[1], groupStandings[2]);
     }
+  } else if (qualificationRule === 'custom') {
+    // Custom rule: all teams qualify (for structures like 9 teams)
+    for (const groupStandings of allGroupStandings) {
+      qualifiers.push(...groupStandings);
+    }
   }
 
   return qualifiers;

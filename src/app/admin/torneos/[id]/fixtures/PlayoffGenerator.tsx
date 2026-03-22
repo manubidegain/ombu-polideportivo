@@ -17,7 +17,163 @@ type Props = {
   categories: Category[];
 };
 
-type QualificationRule = 'top1' | 'top2' | 'top1-best2nds' | 'top1-top2' | 'custom';
+type QualificationRule = 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'top1-top2' | 'custom';
+
+// Bracket Visualization Component
+function BracketVisualization({ teams, structure }: { teams: any[]; structure: any }) {
+  const renderMatch = (team1?: any, team2?: any, round?: string) => (
+    <div className="flex flex-col gap-1">
+      <div className={`border ${team1 ? 'border-red-500 bg-red-500/10' : 'border-white/20 bg-white/5'} rounded px-3 py-2 min-w-40`}>
+        <p className="font-body text-[11px] text-white truncate">
+          {team1 ? `${team1.teamName}` : 'TBD'}
+        </p>
+        {team1 && (
+          <p className="font-body text-[9px] text-gray-400">
+            {team1.groupName} - {team1.groupRank}°
+          </p>
+        )}
+      </div>
+      <div className={`border ${team2 ? 'border-red-500 bg-red-500/10' : 'border-white/20 bg-white/5'} rounded px-3 py-2 min-w-40`}>
+        <p className="font-body text-[11px] text-white truncate">
+          {team2 ? `${team2.teamName}` : 'TBD'}
+        </p>
+        {team2 && (
+          <p className="font-body text-[9px] text-gray-400">
+            {team2.groupName} - {team2.groupRank}°
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderConnector = (height: number = 40) => (
+    <div className="flex items-center">
+      <div className="w-6 border-t border-white/30"></div>
+    </div>
+  );
+
+  const renderVerticalConnector = (height: number = 40) => (
+    <div className="flex flex-col items-center justify-center" style={{ height: `${height}px` }}>
+      <div className="w-px h-full border-l border-white/30"></div>
+    </div>
+  );
+
+  // Simple bracket layouts based on team count
+  if (teams.length === 2) {
+    return (
+      <div className="flex items-center justify-center gap-4">
+        <div className="text-center">
+          <p className="font-body text-[10px] text-gray-400 mb-2">FINAL</p>
+          {renderMatch(teams[0], teams[1])}
+        </div>
+      </div>
+    );
+  }
+
+  if (teams.length <= 4) {
+    return (
+      <div className="flex items-center justify-center gap-6">
+        <div>
+          <p className="font-body text-[10px] text-gray-400 mb-2 text-center">SEMIFINALES</p>
+          <div className="flex flex-col gap-8">
+            {renderMatch(teams[0], teams[3])}
+            {renderMatch(teams[1], teams[2])}
+          </div>
+        </div>
+        <div className="flex flex-col gap-8 items-center">
+          {renderConnector()}
+          {renderVerticalConnector(80)}
+          {renderConnector()}
+        </div>
+        <div className="flex items-center" style={{ minHeight: '160px' }}>
+          <div>
+            <p className="font-body text-[10px] text-gray-400 mb-2 text-center">FINAL</p>
+            {renderMatch()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (teams.length <= 8) {
+    return (
+      <div className="overflow-x-auto">
+        <div className="flex items-center justify-center gap-4 min-w-max">
+          {/* Cuartos */}
+          <div>
+            <p className="font-body text-[10px] text-gray-400 mb-2 text-center">CUARTOS</p>
+            <div className="flex flex-col gap-6">
+              {renderMatch(teams[0], teams[7])}
+              {renderMatch(teams[3], teams[4])}
+              {renderMatch(teams[1], teams[6])}
+              {renderMatch(teams[2], teams[5])}
+            </div>
+          </div>
+
+          {/* Connectors to Semis */}
+          <div className="flex flex-col gap-6 items-center">
+            {renderConnector()}
+            {renderVerticalConnector(60)}
+            {renderConnector()}
+            <div style={{ height: '30px' }}></div>
+            {renderConnector()}
+            {renderVerticalConnector(60)}
+            {renderConnector()}
+          </div>
+
+          {/* Semis */}
+          <div className="flex items-center" style={{ minHeight: '400px' }}>
+            <div>
+              <p className="font-body text-[10px] text-gray-400 mb-2 text-center">SEMIS</p>
+              <div className="flex flex-col gap-24">
+                {renderMatch()}
+                {renderMatch()}
+              </div>
+            </div>
+          </div>
+
+          {/* Connectors to Final */}
+          <div className="flex flex-col items-center justify-center" style={{ minHeight: '400px' }}>
+            {renderConnector()}
+            {renderVerticalConnector(180)}
+            {renderConnector()}
+          </div>
+
+          {/* Final */}
+          <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+            <div>
+              <p className="font-body text-[10px] text-gray-400 mb-2 text-center">FINAL</p>
+              {renderMatch()}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // For 9, 12, 15 teams - show simplified view
+  return (
+    <div className="text-center">
+      <p className="font-body text-[12px] text-gray-400 mb-3">
+        Estructura compleja con {teams.length} equipos
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        {teams.map((team, idx) => (
+          <div key={idx} className="border border-red-500 bg-red-500/10 rounded px-3 py-2">
+            <p className="font-body text-[10px] text-[#dbf228]">Seed {idx + 1}</p>
+            <p className="font-body text-[11px] text-white truncate">{team.teamName}</p>
+            <p className="font-body text-[9px] text-gray-400">
+              {team.groupName} - {team.groupRank}°
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="font-body text-[11px] text-gray-400 mt-3">
+        {structure.structure}
+      </p>
+    </div>
+  );
+}
 
 export function PlayoffGenerator({ tournamentId, categories }: Props) {
   const router = useRouter();
@@ -144,9 +300,18 @@ export function PlayoffGenerator({ tournamentId, categories }: Props) {
         bracketInfo = calculateBracketStructure(qualifierCount);
       }
 
+      // Fetch qualified teams
+      const teams = standingsData.groups.flatMap((g: any) => g.teams);
+      const sortedTeams = teams.sort((a: any, b: any) => {
+        // Sort by group rank first, then by stats
+        if (a.groupRank !== b.groupRank) return a.groupRank - b.groupRank;
+        return 0;
+      });
+
       setPreviewData({
         groups: totalGroups,
         qualifiers: qualifierCount,
+        teams: sortedTeams.slice(0, qualifierCount),
         ...bracketInfo,
       });
     } catch (error: any) {
@@ -426,7 +591,7 @@ export function PlayoffGenerator({ tournamentId, categories }: Props) {
             <h3 className="font-heading text-[16px] text-white">PREVIEW DEL BRACKET</h3>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div>
               <p className="font-body text-[12px] text-gray-400 mb-1">Grupos</p>
               <p className="font-body text-[20px] text-white">{previewData.groups}</p>
@@ -445,10 +610,21 @@ export function PlayoffGenerator({ tournamentId, categories }: Props) {
             </div>
           </div>
 
-          {previewData.qualifiers > 8 && (
+          {/* Visual Bracket */}
+          {previewData.teams && previewData.teams.length > 0 && (
+            <div className="mb-4">
+              <p className="font-body text-[12px] text-gray-400 mb-3">Vista del Bracket:</p>
+              <BracketVisualization
+                teams={previewData.teams}
+                structure={previewData}
+              />
+            </div>
+          )}
+
+          {previewData.qualifiers > 15 && (
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
               <p className="font-body text-[12px] text-yellow-400">
-                ⚠️ Máximo 8 equipos soportados actualmente. Solo los primeros 8 clasificarán.
+                ⚠️ Esta cantidad de equipos no está soportada actualmente.
               </p>
             </div>
           )}

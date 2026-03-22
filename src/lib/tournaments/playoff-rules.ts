@@ -9,7 +9,7 @@
 export type PlayoffStructure = {
   teamCount: number;
   groupStructure: string; // e.g., "2 series de 3"
-  qualificationRule: 'top1' | 'top2' | 'top1-best2nds' | 'custom';
+  qualificationRule: 'top1' | 'top2' | 'top3' | 'top1-best2nds' | 'custom';
   customQualifiers?: number; // For custom rules
   rounds: PlayoffRound[];
   description: string;
@@ -93,20 +93,20 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
       return {
         teamCount: 8,
         groupStructure: '2 series de 4',
-        qualificationRule: 'custom',
-        customQualifiers: 6, // 2 primeros + 2 segundos + 2 terceros (pero solo 2 terceros juegan cuartos)
+        qualificationRule: 'top3', // Primeros, segundos y terceros
+        customQualifiers: 6, // 2 primeros + 2 segundos + 2 terceros
         rounds: [
           {
             name: 'Cuartos',
             matchCount: 2,
             qualifiersNeeded: 4,
-            note: '2°A vs 3°B, 2°B vs 3°A'
+            note: '2°A vs 3°B, 2°B vs 3°A (los primeros esperan)'
           },
           {
             name: 'Semis',
             matchCount: 2,
             qualifiersNeeded: 4,
-            note: '1°A vs ganador QF, 1°B vs ganador QF'
+            note: '1°A vs ganador cuarto, 1°B vs ganador cuarto'
           },
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
@@ -124,8 +124,8 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           {
             name: 'Octavos',
             matchCount: 2,
-            qualifiersNeeded: 8,
-            note: 'Mejor 2° vs Mejor 3°, 2° segundo vs 2° tercero'
+            qualifiersNeeded: 6,
+            note: 'Mejor 2° vs Mejor 3°, otros dos segundos juegan el otro octavo'
           },
           {
             name: 'Cuarto',
@@ -141,7 +141,7 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
           },
           { name: 'Final', matchCount: 1, qualifiersNeeded: 2 }
         ],
-        description: 'Los 3 primeros esperan en semifinales. Segundos y terceros disputan el 4° lugar mediante octavos y cuarto.',
+        description: 'Los 3 primeros esperan en semifinales. Mejor segundo vs mejor tercero, otros segundos juegan octavos.',
         supported: true
       };
 
@@ -168,13 +168,13 @@ export function getPlayoffStructure(teamCount: number): PlayoffStructure {
       return {
         teamCount: 15,
         groupStructure: '5 series de 3',
-        qualificationRule: 'custom',
+        qualificationRule: 'top2',
         customQualifiers: 10, // 5 primeros + 5 segundos
         rounds: [
           {
             name: 'Octavos',
             matchCount: 2,
-            qualifiersNeeded: 8,
+            qualifiersNeeded: 6,
             note: 'Los 4 segundos no clasificados directos juegan por 2 lugares'
           },
           {

@@ -132,12 +132,12 @@ export function generatePlayoffBracket(
   }
 
   // 9 teams: 3 groups of 3
-  // Primeros esperan en semis, mejor 2° vs mejor 3° (oct1), 2° segundo vs 2° tercero (oct2)
+  // Primeros esperan en semis, mejor 2° vs mejor 3° (oct1), otros dos segundos juegan oct2
   // Ganadores de octavos juegan cuarto, ganador de cuarto vs 3er primero en semi
   if (qualifierCount === 9) {
     // Octavos: 2 matches
     const oct1 = createMatch('round-of-16', 1, seededQualifiers[3]?.teamId || null, seededQualifiers[6]?.teamId || null, 1); // Mejor 2° vs Mejor 3°
-    const oct2 = createMatch('round-of-16', 2, seededQualifiers[4]?.teamId || null, seededQualifiers[7]?.teamId || null, 2); // 2° segundo vs 2° tercero
+    const oct2 = createMatch('round-of-16', 2, seededQualifiers[4]?.teamId || null, seededQualifiers[5]?.teamId || null, 2); // 2° segundo vs 3° segundo
 
     // Cuarto: 1 match - ganadores de octavos
     const qf = createMatch('quarter-final', 1, null, null, 1);
