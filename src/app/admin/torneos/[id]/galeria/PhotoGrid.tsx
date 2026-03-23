@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Trash2, Star } from 'lucide-react';
@@ -25,12 +25,38 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
   const router = useRouter();
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+  const [lightboxImageLoading, setLightboxImageLoading] = useState(false);
   const supabase = createClient();
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const getPublicUrl = (filePath: string) => {
+  // Get thumbnail URL for grid (small, optimized)
+  const getThumbnailUrl = (filePath: string) => {
     const {
       data: { publicUrl },
-    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath);
+    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath, {
+      transform: {
+        width: 400,
+        height: 400,
+        resize: 'cover',
+        quality: 80,
+      },
+    });
+    return publicUrl;
+  };
+
+  // Get full-quality URL for lightbox
+  const getFullQualityUrl = (filePath: string) => {
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath, {
+      transform: {
+        width: 1920,
+        height: 1920,
+        resize: 'contain',
+        quality: 90,
+      },
+    });
     return publicUrl;
   };
 
@@ -78,21 +104,61 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
     }
   };
 
+  // Lazy loading for grid images
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            setLoadedImages((prev) => new Set([...prev, index]));
+            observerRef.current?.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '100px',
+      }
+    );
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
   return (
     <>
       {/* Photo Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {photos.map((photo) => (
+        {photos.map((photo, index) => (
           <div
             key={photo.id}
+            data-index={index}
+            ref={(el) => {
+              if (el && observerRef.current && !loadedImages.has(index)) {
+                observerRef.current.observe(el);
+              }
+            }}
             className="relative group aspect-square bg-white/5 rounded-lg overflow-hidden cursor-pointer"
-            onClick={() => setSelectedPhoto(photo)}
+            onClick={() => {
+              setSelectedPhoto(photo);
+              setLightboxImageLoading(true);
+            }}
           >
-            <img
-              src={getPublicUrl(photo.file_path)}
-              alt={photo.caption || photo.file_name}
-              className="w-full h-full object-cover transition-transform group-hover:scale-110"
-            />
+            {loadedImages.has(index) ? (
+              <img
+                src={getThumbnailUrl(photo.file_path)}
+                alt={photo.caption || photo.file_name}
+                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="animate-pulse bg-white/10 w-full h-full" />
+              </div>
+            )}
 
             {/* Featured Badge */}
             {photo.is_featured && (
@@ -140,16 +206,29 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
       {selectedPhoto && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedPhoto(null)}
+          onClick={() => {
+            setSelectedPhoto(null);
+            setLightboxImageLoading(false);
+          }}
         >
           <div
             className="relative max-w-5xl w-full"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Loading Spinner */}
+            {lightboxImageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              </div>
+            )}
+
             <img
-              src={getPublicUrl(selectedPhoto.file_path)}
+              src={getFullQualityUrl(selectedPhoto.file_path)}
               alt={selectedPhoto.caption || selectedPhoto.file_name}
-              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+              className={`w-full h-auto max-h-[80vh] object-contain rounded-lg transition-opacity ${
+                lightboxImageLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+              onLoad={() => setLightboxImageLoading(false)}
             />
 
             {selectedPhoto.caption && (
@@ -160,7 +239,10 @@ export function PhotoGrid({ photos, tournamentId, isAdmin }: Props) {
 
             {/* Close Button */}
             <button
-              onClick={() => setSelectedPhoto(null)}
+              onClick={() => {
+                setSelectedPhoto(null);
+                setLightboxImageLoading(false);
+              }}
               className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
             >
               ✕

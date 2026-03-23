@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
@@ -22,34 +22,64 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+  const [carouselImageLoading, setCarouselImageLoading] = useState(false);
   const supabase = createClient();
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
 
-  const getPublicUrl = (filePath: string) => {
+  // Get thumbnail URL for grid (small, optimized)
+  const getThumbnailUrl = (filePath: string) => {
     const {
       data: { publicUrl },
-    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath);
+    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath, {
+      transform: {
+        width: 400,
+        height: 400,
+        resize: 'cover',
+        quality: 80,
+      },
+    });
+    return publicUrl;
+  };
+
+  // Get full-quality URL for carousel
+  const getFullQualityUrl = (filePath: string) => {
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('tournament-photos').getPublicUrl(filePath, {
+      transform: {
+        width: 1920,
+        height: 1920,
+        resize: 'contain',
+        quality: 90,
+      },
+    });
     return publicUrl;
   };
 
   const openLightbox = (index: number) => {
     setSelectedIndex(index);
+    setCarouselImageLoading(true);
   };
 
   const closeLightbox = () => {
     setSelectedIndex(null);
+    setCarouselImageLoading(false);
   };
 
   const goToPrevious = () => {
     if (selectedIndex !== null && selectedIndex > 0) {
+      setCarouselImageLoading(true);
       setSelectedIndex(selectedIndex - 1);
     }
   };
 
   const goToNext = () => {
     if (selectedIndex !== null && selectedIndex < photos.length - 1) {
+      setCarouselImageLoading(true);
       setSelectedIndex(selectedIndex + 1);
     }
   };
@@ -111,6 +141,30 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
 
   const selectedPhoto = selectedIndex !== null ? photos[selectedIndex] : null;
 
+  // Lazy loading for grid images
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            setLoadedImages((prev) => new Set([...prev, index]));
+            observerRef.current?.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '100px',
+      }
+    );
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
   return (
     <>
       {/* Photo Grid */}
@@ -118,14 +172,27 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
         {photos.map((photo, index) => (
           <div
             key={photo.id}
+            data-index={index}
+            ref={(el) => {
+              if (el && observerRef.current && !loadedImages.has(index)) {
+                observerRef.current.observe(el);
+              }
+            }}
             className="relative group aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer"
             onClick={() => openLightbox(index)}
           >
-            <img
-              src={getPublicUrl(photo.file_path)}
-              alt={photo.caption || photo.file_name}
-              className="w-full h-full object-cover transition-transform group-hover:scale-110"
-            />
+            {loadedImages.has(index) ? (
+              <img
+                src={getThumbnailUrl(photo.file_path)}
+                alt={photo.caption || photo.file_name}
+                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="animate-pulse bg-gray-300 w-full h-full" />
+              </div>
+            )}
 
             {/* Featured Badge */}
             {photo.is_featured && (
@@ -191,10 +258,20 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
             className="relative max-w-7xl w-full px-4 md:px-16"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Loading Spinner */}
+            {carouselImageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              </div>
+            )}
+
             <img
-              src={getPublicUrl(selectedPhoto.file_path)}
+              src={getFullQualityUrl(selectedPhoto.file_path)}
               alt={selectedPhoto.caption || selectedPhoto.file_name}
-              className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              className={`w-full h-auto max-h-[85vh] object-contain rounded-lg transition-opacity ${
+                carouselImageLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+              onLoad={() => setCarouselImageLoading(false)}
             />
 
             {/* Caption and Counter */}
