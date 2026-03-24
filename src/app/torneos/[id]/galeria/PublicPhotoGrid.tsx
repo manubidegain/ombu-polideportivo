@@ -141,7 +141,7 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
 
   const selectedPhoto = selectedIndex !== null ? photos[selectedIndex] : null;
 
-  // Lazy loading for grid images
+  // Initialize IntersectionObserver
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -160,10 +160,18 @@ export function PublicPhotoGrid({ photos, tournamentId }: Props) {
       }
     );
 
+    // Observe all grid items that are already in the DOM
+    const gridItems = document.querySelectorAll('[data-index]');
+    gridItems.forEach((item) => {
+      if (observerRef.current) {
+        observerRef.current.observe(item);
+      }
+    });
+
     return () => {
       observerRef.current?.disconnect();
     };
-  }, []);
+  }, [photos.length]);
 
   return (
     <>
