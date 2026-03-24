@@ -157,13 +157,14 @@ export function ReservationCalendar({ courts, userId }: ReservationCalendarProps
         return start1Minutes < end2Minutes && end1Minutes > start2Minutes;
       };
 
-      // Count overlapping reservations
+      // Count overlapping reservations for THIS timeslot
+      // This counts how many existing reservations overlap with this specific timeslot
       const existingReservationsCount =
         reservations?.filter((r) =>
           doTimesOverlap(timeslot.start_time, timeslot.duration_minutes, r.start_time, r.duration_minutes)
         ).length || 0;
 
-      // Check availability
+      // Check availability based on max_concurrent_bookings for THIS timeslot
       const isAvailable =
         !isBlocked && existingReservationsCount < (timeslot.max_concurrent_bookings || 1);
 

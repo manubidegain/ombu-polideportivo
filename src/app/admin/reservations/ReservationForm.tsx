@@ -153,6 +153,23 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
         .eq('is_active', true)
         .order('priority', { ascending: false });
 
+      // Helper to check if time ranges overlap
+      // Matches PostgreSQL OVERLAPS behavior: consecutive reservations are allowed
+      // (10:00-11:00 and 11:00-12:00 do NOT overlap)
+      const doTimesOverlap = (start1: string, duration1: number, start2: string, duration2: number) => {
+        const [h1, m1] = start1.split(':').map(Number);
+        const [h2, m2] = start2.split(':').map(Number);
+
+        const start1Minutes = h1 * 60 + m1;
+        const end1Minutes = start1Minutes + duration1;
+        const start2Minutes = h2 * 60 + m2;
+        const end2Minutes = start2Minutes + duration2;
+
+        // Ranges overlap if: (start1 < end2) AND (end1 > start2)
+        // This allows consecutive reservations where end1 === start2
+        return start1Minutes < end2Minutes && end1Minutes > start2Minutes;
+      };
+
       // Filter by day of week and calculate prices
       const selectedDate = new Date(newFormData.reservation_date);
       const dayOfWeek = selectedDate.getDay();
@@ -168,12 +185,13 @@ export function ReservationForm({ courts, users }: ReservationFormProps) {
             return slot.start_time >= blocked.start_time && slot.start_time < blocked.end_time;
           });
 
-          // Count existing reservations for this slot
+          // Count overlapping reservations for THIS timeslot
+          // This counts how many existing reservations overlap with this specific timeslot
           const existingCount = existingReservations?.filter(
-            (r) => r.start_time === slot.start_time
+            (r) => doTimesOverlap(slot.start_time, slot.duration_minutes, r.start_time, r.duration_minutes)
           ).length || 0;
 
-          // Check if slot is available
+          // Check if slot is available based on max_concurrent_bookings for THIS timeslot
           const isAvailable = !isBlocked && existingCount < (slot.max_concurrent_bookings || 1);
 
           return {
