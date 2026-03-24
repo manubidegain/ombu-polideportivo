@@ -25,6 +25,16 @@ export const metadata: Metadata = {
   verification: {
     google: "MEDN9SVRsj6GC_LCRV47u4OnfvRlthOgI7nulKCrsVg",
   },
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: "Polideportivo Ombú - Durazno",
+    description: "El punto de encuentro del deporte en Durazno. Pádel, Fútbol 7 y Fútbol 5.",
+    images: ['/logo.png'],
+  },
 };
 
 export default function RootLayout({
