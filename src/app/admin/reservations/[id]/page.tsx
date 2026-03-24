@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { PlayersManager } from '@/components/reservations/PlayersManager';
 import { TeamsManager } from '@/components/reservations/TeamsManager';
 import { ShareSettings } from '@/components/reservations/ShareSettings';
+import { formatLocalDateLong } from '@/lib/utils/date';
 
 interface ReservationDetailPageProps {
   params: Promise<{
@@ -134,12 +135,7 @@ export default async function ReservationDetailPage({ params }: ReservationDetai
             <div>
               <p className="font-body text-[12px] text-gray-400 mb-1">Fecha</p>
               <p className="font-body text-[16px] text-white">
-                {new Date(reservation.reservation_date).toLocaleDateString('es-UY', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {formatLocalDateLong(reservation.reservation_date)}
               </p>
             </div>
 
@@ -277,7 +273,7 @@ export default async function ReservationDetailPage({ params }: ReservationDetai
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <span className="font-body text-[14px]">
-                            {new Date(seriesItem.reservation_date).toLocaleDateString('es-UY', {
+                            {formatLocalDateLong(seriesItem.reservation_date, {
                               weekday: 'short',
                               month: 'short',
                               day: 'numeric',

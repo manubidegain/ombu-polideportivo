@@ -146,14 +146,58 @@ export function BulkTimeslotForm({ courts }: BulkTimeslotFormProps) {
     }
 
     try {
-      const { error: insertError } = await supabase
-        .from('timeslot_configs')
-        .insert(timeslotsToInsert);
+      let successCount = 0;
+      let duplicateCount = 0;
+      let errorCount = 0;
+      const errors: string[] = [];
 
-      if (insertError) throw insertError;
+      // Insert timeslots one by one to handle duplicates gracefully
+      for (const timeslot of timeslotsToInsert) {
+        const { error: insertError } = await supabase
+          .from('timeslot_configs')
+          .insert([timeslot]);
 
-      router.push('/admin/timeslots');
-      router.refresh();
+        if (insertError) {
+          // Check if it's a duplicate key error
+          if (insertError.code === '23505' || insertError.message.includes('duplicate key')) {
+            duplicateCount++;
+          } else {
+            errorCount++;
+            errors.push(insertError.message);
+          }
+        } else {
+          successCount++;
+        }
+      }
+
+      // Show results summary
+      if (successCount > 0) {
+        const messages = [`✓ ${successCount} horarios creados exitosamente`];
+        if (duplicateCount > 0) {
+          messages.push(`⚠️ ${duplicateCount} horarios ya existían (duplicados ignorados)`);
+        }
+        if (errorCount > 0) {
+          messages.push(`✗ ${errorCount} horarios con errores`);
+        }
+
+        // If there were any errors (non-duplicate), show them
+        if (errors.length > 0) {
+          setError(messages.join('\n') + '\n\nErrores:\n' + errors.slice(0, 3).join('\n'));
+          setLoading(false);
+        } else {
+          // Success! Redirect
+          router.push('/admin/timeslots?message=' + encodeURIComponent(messages.join('. ')));
+          router.refresh();
+        }
+      } else {
+        // No timeslots were created
+        if (duplicateCount === timeslotsToInsert.length) {
+          setError('Todos los horarios ya existen en el sistema');
+        } else {
+          setError('No se pudo crear ningún horario. ' + (errors[0] || 'Error desconocido'));
+        }
+        setLoading(false);
+      }
     } catch (err: any) {
       console.error('Error creating timeslots:', err);
       setError(err.message || 'Error al crear los horarios');

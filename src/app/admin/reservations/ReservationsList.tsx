@@ -7,6 +7,7 @@ import type { Tables } from '@/types/database.types';
 import Link from 'next/link';
 import { List, Calendar as CalendarIcon, ArrowUpDown } from 'lucide-react';
 import { CalendarView } from './CalendarView';
+import { formatLocalDate } from '@/lib/utils/date';
 
 type Reservation = Tables<'reservations'> & {
   courts: { name: string } | null;
@@ -464,10 +465,10 @@ export function ReservationsList({ initialReservations, courts }: ReservationsLi
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-body text-[12px] sm:text-[14px] text-white whitespace-nowrap">
-                          {new Date(reservation.reservation_date).toLocaleDateString('es-UY')}
+                          {formatLocalDate(reservation.reservation_date)}
                           {isSeries && seriesInfo && (
                             <span className="text-gray-400 text-[10px] sm:text-[12px] ml-1">
-                              - {new Date(seriesInfo.lastDate).toLocaleDateString('es-UY')}
+                              - {formatLocalDate(seriesInfo.lastDate)}
                             </span>
                           )}
                         </span>

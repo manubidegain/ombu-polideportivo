@@ -7,6 +7,7 @@ import type { Tables } from '@/types/database.types';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { parseLocalDate } from '@/lib/utils/date';
 
 type Reservation = Tables<'reservations'> & {
   courts: { name: string; type: string } | null;
@@ -143,7 +144,7 @@ export function MyReservationsList({ reservations: initialReservations }: MyRese
                       <div>
                         <p className="font-body text-[12px] text-gray-400">Fecha</p>
                         <p className="font-body text-[16px] text-white">
-                          {format(new Date(reservation.reservation_date), "EEEE d 'de' MMMM", {
+                          {format(parseLocalDate(reservation.reservation_date), "EEEE d 'de' MMMM", {
                             locale: es,
                           })}
                         </p>
@@ -223,7 +224,7 @@ export function MyReservationsList({ reservations: initialReservations }: MyRese
                         {reservation.courts?.name}
                       </h3>
                       <p className="font-body text-[14px] text-gray-400">
-                        {format(new Date(reservation.reservation_date), "d 'de' MMM", {
+                        {format(parseLocalDate(reservation.reservation_date), "d 'de' MMM", {
                           locale: es,
                         })}{' '}
                         - {reservation.start_time}
